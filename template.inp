@@ -1,0 +1,64 @@
+# NOTE: You don't need all these comments.  If you remove the documentation,
+# this file is actually quite small.
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+# The rate of the exchange is given here.  
+# You may give it in either 'lifetime' or 'rate', but not both.
+# The default unit is ps, but you can change it to fs, ps, ns, or s.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+rate 1.54 ps
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+# The peak lines contain the peaks you want to plot.
+# The vibrational wavenumber is given first, and then the relative height.
+# You may give a Gaussian linewidth with g=# or G=#.
+# You may five a Lorentzian linewidth with l=# or L=#.
+# If you omit these linewidths, they default to 10.0.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+peak 1949.8 0.38 l=5.6 g=1.2
+peak 1970.3 0.35 L=5.6 g=0.9
+peak 2027.6 0.27 l=2.6 G=0.7
+# or, you may number the peaks yourself if you wish:
+#peak 1935.0 1.0 g=8 num=1
+#peak 1965.0 0.6 L=11 g=9 num=2
+#peak 2050.0 1.0 num=3
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+# The exchange lines dictates the relatice exchange rate between two
+# peaks.  Not every peak pair given needs to exchange.
+# Don't include any exchange lines to see the absence of exchange.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+exchange 1 2 1.0
+exchange 1 3 0.0
+exchange 2 3 0.0
+# The below set matches the exchange matrix in the Grevels JACS paper
+#exchange 1 2 0.7405
+#exchange 2 3 0.0283
+#exchange 1 3 0.0096
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+# The keyword extra_numbers will print to screen some extra
+# numerical data to give you an idea of what is going on.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#save_plot_script script.py
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+# The keyword data gives the name of the file that you wish
+# to put the spectral data into.  If you omit this keyword,
+# a plot is shown on the screen.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#data results.txt
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+# This is the raw data file you wish to include.
+# It can be the absolute path or relative to this directory.
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+#raw your_experimental_data.txt
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+# This is the wavenumber range to plot.  
+# If you omit this keyword, the default is 1900 2000
+# The reverse keyword causes the wavenumver range to be reversed
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+xlim 1900 2050
+reverse
