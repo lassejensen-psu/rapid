@@ -10,7 +10,7 @@ def plot(args, x, y):
         print('It appears that you are missing matplotlib.', file=stderr)
         print('You should install it using your favorite method', file=stderr)
         return 1
-    from .common import normalize, clip
+    from common import normalize, clip
     
     # Normalize the generated data
     y = normalize(y)

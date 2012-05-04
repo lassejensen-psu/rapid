@@ -15,10 +15,12 @@ SQRT2PI = sqrt(2 * pi)
 omega = arange(200, 3000, 0.5)
 
 def spectrum(peak_exchanges, relative_rates, k, vib, 
-             Gamma_Lorentz, Gamma_Gaussian, heights)
+             Gamma_Lorentz, Gamma_Gauss, heights):
     '''This routine contains the code that drives the actual calculation
     of the intensities.
     '''
+    npeaks = len(vib)
+    N = range(npeaks)
 
     ################################################
     # Construct the K (exchange) matrix of the rates
@@ -26,14 +28,14 @@ def spectrum(peak_exchanges, relative_rates, k, vib,
 
     # Place the relative exchange rates symmetrically in Z
     Z = zeros((npeaks, npeaks))
-    for index, rate in zip(peak_exchanges, exchange_rates):
+    for index, rate in zip(peak_exchanges, relative_rates):
         Z[index[0],index[1]] = rate
         Z[index[1],index[0]] = rate
 
     # The diagonals of Z must be 1 minus the sum
     # of the off diagonals for that row
     sums = zeros(npeaks)
-    for i in xrange(npeaks):
+    for i in N:
         sums[i] = sum(Z[i,:])
         Z[i,i]  = 1 - sums[i]
 
@@ -75,7 +77,6 @@ def spectrum(peak_exchanges, relative_rates, k, vib,
     # Construct an array of the new parameters
     ##########################################
 
-    N = range(npeaks)
     h = [height(j, heights, S, Sinv) for j in N]
     peaks = [-x.imag for x in Lambda]
     HWHM  = [x.real for x in Lambda]
@@ -90,7 +91,7 @@ def spectrum(peak_exchanges, relative_rates, k, vib,
     # Also create the modified input parameters for return
     GL = [2 * x for x in HWHM]
     GG = [SQRT2LOG2_2 * x for x in sigmas]
-    new_params = peaks, GL, GG, h
+    new_params = peaks, GL, GG, [x.real for x in h]
 
     ###############################################
     # Use these new values to calucate the spectrum
@@ -115,6 +116,7 @@ def voigt(freq, j, height, vib, HWHM, sigma):
 
 def height(j, heights, S, Sinv):
     '''Return the modified peak height'''
+    N = range(len(heights))
     return sum([heights[a] * S[a,j] * Sinv[j,ap] for a in N for ap in N])
 
 class SpectrumError(Exception):

@@ -27,7 +27,7 @@ if __name__ == '__main__':
         exit(1)
 
     # If an argument was given, then run the non-interactive mode
-    if len(argv) >= 1:
+    if len(argv) == 1:
         from gui import gui
         exit(run_gui())
 

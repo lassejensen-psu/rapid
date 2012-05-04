@@ -24,10 +24,10 @@ def numerics(old_params, new_params, out):
 
     # Extract values
     N = range(len(old_params[0]))
-    vib = [old_params[0][i], new_params[0][i] for i in N]
-    GL  = [old_params[1][i], new_params[1][i] for i in N]
-    GG  = [old_params[2][i], new_params[2][i] for i in N]
-    h   = [old_params[3][i], new_params[3][i] for i in N]
+    vib = [(old_params[0][i], new_params[0][i]) for i in N]
+    GL  = [(old_params[1][i], new_params[1][i]) for i in N]
+    GG  = [(old_params[2][i], new_params[2][i]) for i in N]
+    h   = [(old_params[3][i], new_params[3][i]) for i in N]
 
     # Write to specified location
     sr = '# {0:15}:{1[0]:^25g}{1[1]:^30g}'

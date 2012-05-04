@@ -12,9 +12,10 @@ def run_non_interactive(input_file):
         print("Cannot find input_reader module", file=stderr)
         print("Find it at github.com/SethMMorton/input_reader", file=stderr)
         return 1
-    from .common import spectrum, SpectrumError, \
-                        numerics, write_data, save_script
+    from common import spectrum, SpectrumError, \
+                       numerics, write_data, save_script
     from plot import plot
+    from read_input import read_input
 
     # Read in the input file that is given
     try:
@@ -32,8 +33,8 @@ def run_non_interactive(input_file):
                                               args.exchange_rates,
                                               args.k,
                                               args.vib,
-                                              args.Gamma_Lorentz
-                                              args.Gamma_Gaussian,
+                                              args.Gamma_Lorentz,
+                                              args.Gamma_Gauss,
                                               args.heights
                                              )
     except SpectrumError as se:
@@ -42,8 +43,8 @@ def run_non_interactive(input_file):
 
     # Make a tuple of the old parameters
     old_params = (args.vib,
-                  args.Gamma_Lorentzian,
-                  args.Gamma_Gaussian,
+                  args.Gamma_Lorentz,
+                  args.Gamma_Gauss,
                   args.heights)
 
     # Plot the data or write to file

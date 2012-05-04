@@ -19,7 +19,7 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
 
     {title}
     {spacer}\
-    ''').format(title=title, spacer=spacer))
+    ''').format(title=title, spacer=spacer), file=out)
 
     # Write a table of the parameters
     numerics(old_params, new_params, out)
@@ -34,7 +34,7 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
 
     # Set the x limits properly
     if reverse:
-        xlim[0], xlim[1] = xlim[1], xlim[0]
+        xlim = xlim[1], xlim[0]
 
     # Print this function to file
     print(dedent("""\
