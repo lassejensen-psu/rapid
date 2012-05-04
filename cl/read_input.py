@@ -4,8 +4,8 @@ from math import pi
 from numpy import array, loadtxt
 from input_reader import InputReader, SUPPRESS, ReaderError, \
                          range_check, abs_file_path
-from constants import HZ2WAVENUM
-Fs = 1E-15 # Femptoseconds
+HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 ) # Hz to cm^{-1} conversion
+Fs = 1E-15                              # Femptoseconds
 
 __all__ = ['read_input', 'ReaderError']
 
@@ -67,12 +67,6 @@ def read_input(input_file):
     # Output a script to replot
     if 'save_plot_script' in args:
         args.save_plot_script = open(abs_file_path(args.save_plot_script), 'w')
-        print('#! /usr/bin/env python', file=args.save_plot_script)
-        print('from __future__ import print_function, division',
-              file=args.save_plot_script)
-        print('from pylab import *', file=args.save_plot_script)
-    elif args.parameters:
-        args.save_plot_script = stdout
     else:
         args.save_plot_script = None
 
@@ -146,7 +140,8 @@ def read_input(input_file):
     # Make sure the xlimits are asending
     try:
         range_check(args.xlim[0], args.xlim[1])
-    except AssertionError:
-        exit('In xrange, the low value must less than the high value')
+    except ValueError:
+        raise ReaderError('In xrange, the low value must '
+                          'less than the high value')
 
     return args
