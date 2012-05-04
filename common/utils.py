@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 from sys import stderr
+from numpy import where
 
 def write_data(x, y, datafile):
     '''Writes the normalized data to file.'''
@@ -36,6 +37,7 @@ def numerics(old_params, new_params, out):
         print(sr.format('Gamma Lorentz', GL[i]),  file=out)
         print(sr.format('Gamma Gauss',   GG[i]),  file=out)
         print(sr.format('Rel. Height',   h[i]),   file=out)
+    return 0
 
 def normalize(y, x=None, xlimits=None):
     '''Normalizes a data set.  Clips according to x-values if given.''' 
