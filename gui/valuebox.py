@@ -39,6 +39,11 @@ class ValueBox(QGroupBox):
         # Store the underlying model
         self.model = model
 
+        # Add the peak chooser
+        self.peakChooser = QComboBox(self)
+        self.peakChooser.setModel(self.model)
+        self.peakChooser.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
         # Add the parameter chooser
         self.paramChooser = QComboBox(self)
         self.paramChooser.setModel(self.model)
@@ -71,6 +76,8 @@ class ValueBox(QGroupBox):
 
         # Set up the location of all the contained widgets
         rangeLayout = QHBoxLayout()
+        rangeLayout.addWidget(QLabel('Peak'))
+        rangeLayout.addWidget(self.peakChooser)
         rangeLayout.addWidget(QLabel('Parameters'))
         rangeLayout.addWidget(self.paramChooser)
         rangeLayout.addStretch()
