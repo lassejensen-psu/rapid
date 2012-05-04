@@ -7,17 +7,18 @@ from numpy.testing import assert_approx_equal
 class ValueBox(QGroupBox):
     '''A box that sets values'''
 
-    def __init__(self, parent, title, boxID, model):
+    def __init__(self, parent, title, boxID, controller):
         '''Initiallize the box and what is inside it'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
+        self.control = controller
         self._boxID = boxID
-        self._createWidgets(model)
-        self._makeConnections()
+        self._createWidgets()
+        #self._makeConnections()
         self._initUI()
         self.paramIndx = self._boxID
 
-    def _createWidgets(self, model):
+    def _createWidgets(self):
         '''Create the widgets contained in this box'''
 
         # Min range spin box
@@ -36,17 +37,14 @@ class ValueBox(QGroupBox):
         self.valueSlider = QwtSlider(self, Qt.Horizontal)
         self.valueSlider.setMinimumWidth(500)
 
-        # Store the underlying model
-        self.model = model
-
         # Add the peak chooser
         self.peakChooser = QComboBox(self)
-        self.peakChooser.setModel(self.model)
+        #self.peakChooser.setModel(self.control)
         self.peakChooser.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # Add the parameter chooser
         self.paramChooser = QComboBox(self)
-        self.paramChooser.setModel(self.model)
+        #self.paramChooser.setModel(self.control)
         self.paramChooser.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
     def _makeConnections(self):

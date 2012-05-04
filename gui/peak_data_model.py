@@ -6,37 +6,7 @@ from cStringIO import StringIO
 from textwrap import dedent
 from numpy import arange
 
-# Load a predefined selection of functions from numpy & friends
-from math import pi, e
-npstr = ('abs, absolute, add, multiply, angle, arccos, arcsin, '
-         'arctan, arccosh, arcsinh, arctanh, arctan2, ceil, floor, '
-         'round, conj, conjugate, cos, sin, tan, cosh, sinh, tanh, '
-         'fix, hypot, maximum, minimum, sqrt, square, sign, real, '
-         'imag, remainder, modf, fmod, mod, true_divide, subtract, '
-         'floor_divide, power, reciprocal, exp, expm1, exp2, log, '
-         'log10, log2, log1p, prod, sum, degrees, radians'
-        )
-exec 'from numpy import '+npstr
-conststr = 'epsilon_0, h, hbar, R, N_A'
-exec 'from scipy.constants import '+conststr
-specstr = 'erf, erfc, wofz'
-exec 'from scipy.special import '+specstr
-
-# We want ln to be interprited as log, and I as 1j
-ln = log
-I = 1j
-
-# Store the function names and constant names
-funcnames = set(npstr.split(', ')+specstr.split(', ')+['ln'])
-constnames = set(conststr.split(', ')+['pi,', 'e', 'I'])
-
-# Make a dictionary of allowed function names
-functs = dict([(k, locals().get(k, None)) for k in funcnames|constnames])
-
-# A test domain
-testdomain = arange(10)
-
-class Function(QStandardItemModel):
+class PeakData(QStandardItemModel):
     '''Class to hold all information about the function'''
 
     def __init__(self, parent):
