@@ -5,7 +5,6 @@ from PyQt4.QtGui import QApplication, QMainWindow, QWidget, QVBoxLayout, \
 from plot import Plot
 from valuebox import ValueBox
 from function import Function
-from inputfunction import InputFunction
 
 def run_gui():
     '''Start the event loop'''
@@ -34,7 +33,7 @@ class MainWindow(QMainWindow):
         '''Creates all the widgets'''
         self.plot = Plot(self)
         #self.functionField = InputFunction(self)
-        #self.function = Function(self)
+        self.function = Function(self)
         #self.plotButton = QPushButton('&Plot', self)
         self.vbox = [ValueBox(self, 'Parameter Value Picker 1', 0, self.function),
                      ValueBox(self, 'Parameter Value Picker 2', 1, self.function)]

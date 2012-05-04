@@ -1,7 +1,6 @@
-from PyQt4.Qwt5 import QwtPlot
+from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve
 from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
-from xypoints import XYPoints
 
 class Plot(QwtPlot):
     '''A plot'''
@@ -31,21 +30,19 @@ class Plot(QwtPlot):
         canvasPalette.setColor(QPalette.Foreground, Qt.gray)
         self.canvas().setPalette(canvasPalette)
 
-        # Create the XY data points and default the function to sin()
-        self.data = XYPoints(nPoints=1000)
+        # Create the XY data points
+        self.data = QwtPlotCurve()
+        self.data.setRenderHint(QwtPlotCurve.RenderAntialiased)
         self.data.setPen(QPen(Qt.blue))
         self.data.attach(self)
  
-        # Initiallize the data
-        self.data.setDomain(0.0, 10.0)
-
     #######
     # SLOTS
     #######
 
-    def plotFunction(self, function):
+    def plotFunction(self, x, y):
         '''Plot the given function'''
-        self.data.setFunctionData(function)
+        self.data.setData(x, y)
         self.replot()
 
     #########
