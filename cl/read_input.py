@@ -61,14 +61,12 @@ def read_input(input_file):
         args.raw = loadtxt(abs_file_path(args.raw))
 
     # Make the output file path absolute if given
-    if 'data' in args:
-        args.data = abs_file_path(args.data)
+    args.data = abs_file_path(args.data) if 'data' in args else ''
 
-    # Output a script to replot
     if 'save_plot_script' in args:
-        args.save_plot_script = open(abs_file_path(args.save_plot_script), 'w')
+        args.save_plot_script = abs_file_path(args.save_plot_script)
     else:
-        args.save_plot_script = None
+        args.save_plot_script = ''
 
     # Adjust the input rate or lifetime to wavenumbers
     if 'lifetime' in args:
