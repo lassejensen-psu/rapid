@@ -1,18 +1,20 @@
 from __future__ import print_function
 from sys import stderr, stdout
-try:
-    from input_reader import ReaderError
-except ImportError:
-    print("Cannot find input_reader module", file=stderr)
-    print("Find it at github.com/SethMMorton/input_reader", file=stderr)
-    return 1
-from output import write, save_script, plot
-from .common import spectrum, SpectrumError
 
 def run_non_interactive(input_file):
     '''Driver to calculate the spectra non-interactively
     (i.e. from the command line).
     '''
+    # Import needed functions.  Do so here to handle errors better
+    try:
+        from input_reader import ReaderError
+    except ImportError:
+        print("Cannot find input_reader module", file=stderr)
+        print("Find it at github.com/SethMMorton/input_reader", file=stderr)
+        return 1
+    from .common import spectrum, SpectrumError, \
+                        numerics, write_data, save_script
+    from plot import plot
 
     # Read in the input file that is given
     try:
@@ -45,12 +47,12 @@ def run_non_interactive(input_file):
                   args.heights)
 
     # Plot the data or write to file
-    if 'data' in args:
-        return write(omega, I_omega, args.data)
+    if args.data:
+        return write_data(omega, I_omega, args.data)
+    elif args.save_plot_script:
+        return save_script(omega, I_omega, args.raw, args.xlim, args.reverse,
+                           old_params, new_params, args.save_plot_script)
     elif args.parameters:
         return numerics(old_params, new_params, stdout)
-    elif args.save_plot_script is not None:
-        return save_script(omega, I_omega, old_params, new_params,
-                           args.save_plot_script)
     else:
         return plot(args, omega, I_omega)
