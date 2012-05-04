@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 from __future__ import print_function, division
 from sys import argv, exit, stderr
 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
 
     # If an argument was given, then run the non-interactive mode
     if len(argv) == 1:
-        from gui import gui
+        from gui import run_gui
         exit(run_gui())
 
     # Otherwise, run the GUI
