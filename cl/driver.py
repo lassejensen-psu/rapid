@@ -12,7 +12,7 @@ def run_non_interactive(input_file):
         print("Cannot find input_reader module", file=stderr)
         print("Find it at github.com/SethMMorton/input_reader", file=stderr)
         return 1
-    from common import spectrum, SpectrumError, \
+    from common import spectrum, SpectrumError, ZMat, \
                        numerics, write_data, save_script
     from plot import plot
     from read_input import read_input
@@ -27,10 +27,12 @@ def run_non_interactive(input_file):
         print(str(r), file=stderr) # An error occured when reading the file
         return 1
 
+    # Generate the Z matrix
+    Z = ZMat(len(args.vib), args.exchanges, args.exchange_rates, True)
+
     # Calculate the spectrum
     try:
-        I_omega, omega, new_params = spectrum(args.exchanges,
-                                              args.exchange_rates,
+        I_omega, omega, new_params = spectrum(Z,
                                               args.k,
                                               args.vib,
                                               args.Gamma_Lorentz,

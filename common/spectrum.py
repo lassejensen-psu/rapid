@@ -14,36 +14,42 @@ SQRT2PI = sqrt(2 * pi)
 # Frequency domain over interesting region
 omega = arange(200, 3000, 0.5)
 
-def spectrum(peak_exchanges, relative_rates, k, vib, 
-             Gamma_Lorentz, Gamma_Gauss, heights):
+def ZMat(npeaks, peak_exchanges, relative_rates, symmetric):
+    '''Construct the Z matrix.  Symmetry can be enforced or not.'''
+
+    Z = zeros((npeaks, npeaks))
+
+    if symmetric:
+        # Place the relative exchange rates symmetrically in Z
+        for index, rate in zip(peak_exchanges, relative_rates):
+            Z[index[0],index[1]] = rate
+            Z[index[1],index[0]] = rate
+
+        # The diagonals of Z must be 1 minus the sum
+        # of the off diagonals for that row
+        sums = zeros(npeaks)
+        for i in xrange(npeaks):
+            sums[i] = sum(Z[i,:])
+            Z[i,i]  = 1 - sums[i]
+
+        # Now, if any of the sums are greater than 1, normalize
+        if any(sums > 1):
+            Z /= sums.max()
+    else:
+        # Place the relative exchange rates in Z
+        for index, rate in zip(peak_exchanges, relative_rates):
+            Z[index[0],index[1]] = rate
+        
+    return Z
+
+def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights):
     '''This routine contains the code that drives the actual calculation
     of the intensities.
     '''
     npeaks = len(vib)
     N = range(npeaks)
 
-    ################################################
-    # Construct the K (exchange) matrix of the rates
-    ################################################
-
-    # Place the relative exchange rates symmetrically in Z
-    Z = zeros((npeaks, npeaks))
-    for index, rate in zip(peak_exchanges, relative_rates):
-        Z[index[0],index[1]] = rate
-        Z[index[1],index[0]] = rate
-
-    # The diagonals of Z must be 1 minus the sum
-    # of the off diagonals for that row
-    sums = zeros(npeaks)
-    for i in N:
-        sums[i] = sum(Z[i,:])
-        Z[i,i]  = 1 - sums[i]
-
-    # Now, if any of the sums are greater than 1, normalize
-    if any(sums > 1):
-        Z /= sums.max()
-
-    # Finally, multiply Z-I by k to get K
+    # Multiply Z-I by k to get K
     K = k * ( Z - eye(npeaks) )
 
     ############################
