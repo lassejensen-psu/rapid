@@ -7,15 +7,12 @@ from numpy.testing import assert_approx_equal
 class ValueBox(QGroupBox):
     '''A box that sets values'''
 
-    def __init__(self, parent, title, boxID, controller):
+    def __init__(self, parent, title, boxID):
         '''Initiallize the box and what is inside it'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
-        self.control = controller
         self._boxID = boxID
         self._createWidgets()
-        #self._makeConnections()
-        self._initUI()
         self.paramIndx = self._boxID
 
     def _createWidgets(self):
@@ -47,7 +44,7 @@ class ValueBox(QGroupBox):
         #self.paramChooser.setModel(self.control)
         self.paramChooser.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-    def _makeConnections(self):
+    def makeConnections(self):
         'Connect the contained widgets to each other and set initial values'
 
         # If the value spinbox changes, check the bounds of the slider range
@@ -69,7 +66,7 @@ class ValueBox(QGroupBox):
         # If the combo box is changed, send out a signal
         self.paramChooser.currentIndexChanged.connect(self.changeParameter)
 
-    def _initUI(self):
+    def initUI(self):
         '''Place the widgets in the proper locations in the box'''
 
         # Set up the location of all the contained widgets
@@ -93,6 +90,11 @@ class ValueBox(QGroupBox):
         valuePickerLayout.addLayout(rangeLayout)
         valuePickerLayout.addLayout(pickerLayout)
         self.setLayout(valuePickerLayout)
+
+    def setModel(self, model):
+        '''Attaches the views to a model'''
+        self.model = model
+        
 
     #######
     # SLOTS
