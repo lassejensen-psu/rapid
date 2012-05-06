@@ -76,7 +76,6 @@ def read_input(input_file):
         convert = { 'ps' : 1E12, 'ns' : 1E9, 'fs' : 1E15, 's' : 1 }
         args.add('k', convert[args.rate[1]] * args.rate[0])
     args.k *= HZ2WAVENUM / ( 2 * pi )
-    print(args.k)
 
     # Parse the vibrational input
     num, vib, Gamma_Lorentz, Gamma_Gauss, heights, rel_rates, num_given = (
