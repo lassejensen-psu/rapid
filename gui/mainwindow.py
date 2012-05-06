@@ -32,6 +32,8 @@ class MainWindow(QMainWindow):
         # Doing it twice seems to fix a bug
         self.exchange.numpeaks.setValue(5)
         self.exchange.numpeaks.setValue(2)
+        # Set matrix to symmetric by default
+        self.exchange.symmetry.setChecked(True)
 
     def _createtWidgets(self):
         '''Creates all the widgets'''
@@ -45,7 +47,7 @@ class MainWindow(QMainWindow):
         #self.peak_data = PeakData(self)
 
         # Create the model controller
-        self.control = Controller(self, self.exchange)
+        self.control = Controller(self)
 
         # Attach models to the views
         self.vbox[0].setModel(self.control)

@@ -7,12 +7,12 @@ from rate import Rate
 class Controller(QObject):
     '''Class to hold all information about the function'''
 
-    def __init__(self, parent, exchangeparent):
+    def __init__(self, parent):
         '''Initiallize the controller class'''
         super(QObject, self).__init__(parent)
         self.rate = Rate(self)
         self.numpeaks = NumPeaks(self)
-        self.exchange = ExchangeModel(exchangeparent)
+        self.exchange = ExchangeModel(self)
         self._makeConnections()
 
 
