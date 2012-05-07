@@ -5,7 +5,6 @@ from numpy import array, loadtxt
 from input_reader import InputReader, SUPPRESS, ReaderError, \
                          range_check, abs_file_path
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 ) # Hz to cm^{-1} conversion
-Fs = 1E-15                              # Femptoseconds
 
 __all__ = ['read_input', 'ReaderError']
 
@@ -19,11 +18,14 @@ def read_input(input_file):
     # Rate parameter, either rate or lifetime, not both
     rate = reader.add_mutually_exclusive_group(required=True)
     # The units are s, ns, ps, or fs.  The default is ps.
-    unitglob = {'len' : '?',
-                'type' : ('ps', 'fs', 'ns', 's'),
-                'default' : 'ps'}
-    rate.add_line_key('lifetime', type=float, glob=unitglob)
-    rate.add_line_key('rate',     type=float, glob=unitglob)
+    rate.add_line_key('lifetime', type=float,
+                      glob={'len' : '?',
+                            'type' : ('ps', 'fs', 'ns', 's'),
+                            'default' : 'ps'})
+    rate.add_line_key('rate', type=float,
+                      glob={'len' : '?',
+                            'type' : ('thz', 'phz', 'ghz', 'hz'),
+                            'default' : 'thz'})
 
     # The range of the X-axis
     reader.add_line_key('xlim', type=[float, float], default=(1900.0, 2000.0))
@@ -73,7 +75,7 @@ def read_input(input_file):
         convert = { 'ps' : 1E-12, 'ns' : 1E-9, 'fs' : 1E-15, 's' : 1 }
         args.add('k', 1 / ( convert[args.lifetime[1]] * args.lifetime[0] ))
     else:
-        convert = { 'ps' : 1E12, 'ns' : 1E9, 'fs' : 1E15, 's' : 1 }
+        convert = { 'thz' : 1E12, 'ghz' : 1E9, 'phz' : 1E15, 'hz' : 1 }
         args.add('k', convert[args.rate[1]] * args.rate[0])
     args.k *= HZ2WAVENUM / ( 2 * pi )
 

@@ -109,8 +109,6 @@ def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights):
             omega,
             new_params)
 
-    #return spect, omega
-
 def voigt(freq, j, height, vib, HWHM, sigma):
     '''Return a Voigt line shape over a given domain about a given vib'''
 

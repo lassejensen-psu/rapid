@@ -16,7 +16,6 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self._createtWidgets()
         self._initUI()
-        #self._makeConnections()
 
         # Default to rate in units of ps
         self.rate.rate.click()
@@ -24,10 +23,11 @@ class MainWindow(QMainWindow):
 
         # Set initial number of peaks to 2
         # Doing it twice seems to fix a bug
-        self.exchange.numpeaks.setValue(5)
+        self.exchange.numpeaks.setValue(3)
         self.exchange.numpeaks.setValue(2)
         # Set matrix to symmetric by default
         self.exchange.symmetry.setChecked(True)
+        self._makeConnections()
 
     def _createtWidgets(self):
         '''Creates all the widgets'''
@@ -82,15 +82,8 @@ class MainWindow(QMainWindow):
     def _makeConnections(self):
         '''Connect the widgets to each other'''
 
-        # If the plot button is pressed (or return is pressed), plot the function
-        self.plotButton.clicked.connect(self.functionField.plotFunction)
-        self.functionField.returnPressed.connect(self.functionField.plotFunction)
-
-        # If the function is broadcasted, have the function class catch and  parse it
-        self.functionField.broadcastFunction.connect(self.function.parseFunction)
-
-        # When the function class emits the function, have the plot grab it
-        self.function.hasPlotableFunction.connect(self.plot.plotFunction)
+        # When the controller says plot, plot
+        self.control.plotSpectrum.connect(self.plot.plotFunction)
 
     #######
     # SLOTS

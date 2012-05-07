@@ -4,7 +4,7 @@ from PyQt4.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
                         QSpinBox, QComboBox, QStringListModel, QCheckBox, \
                         QDoubleSpinBox, QGridLayout
 from numpy.testing import assert_approx_equal
-from numpy import zeros, vstack, ndenumerate, ndindex
+from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
 from math import pi
 from common import ZMat
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
@@ -143,6 +143,7 @@ class NumPeaks(QObject):
     def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
+        self.numPeaks = 2
 
     #######
     # SLOTS
@@ -151,14 +152,14 @@ class NumPeaks(QObject):
     def setNumPeaks(self, num):
         '''Sets the number of peaks'''
         self.numPeaks = num
-        self.numberOfPeaksChanged.emit()
+        self.numberOfPeaksChanged.emit(self.numPeaks)
 
     #########
     # SIGNALS
     #########
 
     # The number of peaks
-    numberOfPeaksChanged = pyqtSignal()
+    numberOfPeaksChanged = pyqtSignal(int)
 
 #/\/\/\/\/\/\/\/
 # Exchange Model
@@ -170,7 +171,7 @@ class ExchangeModel(QObject):
     def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
-        self.matrix = zeros((4,4))
+        self.matrix = zeros((2,2))
         self.sym = True
 
         # Make the exchange models

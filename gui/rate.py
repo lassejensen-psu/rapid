@@ -10,6 +10,8 @@ class Rate(QObject):
     def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
+        self.rate = 0
+        self.wn_rate = 0
 
     def setConverter(self, unit):
         '''Sets the function to perform rate conversion to cm^{-1}'''
@@ -19,10 +21,10 @@ class Rate(QObject):
                  'ps'   : lambda x : HZ2WAVENUM / ( 1E-12 * x ),
                  'ns'   : lambda x : HZ2WAVENUM / ( 1E-9  * x ),
                  's'    : lambda x : HZ2WAVENUM / (         x ),
-                 '1/fs' : lambda x : HZ2WAVENUM * 1E15 * x,
-                 '1/ps' : lambda x : HZ2WAVENUM * 1E12 * x,
-                 '1/ns' : lambda x : HZ2WAVENUM * 1E9  * x,
-                 '1/s'  : lambda x : HZ2WAVENUM        * x,
+                 'PHz'  : lambda x : HZ2WAVENUM * 1E15 * x,
+                 'THz'  : lambda x : HZ2WAVENUM * 1E12 * x,
+                 'GHz'  : lambda x : HZ2WAVENUM * 1E9  * x,
+                 'Hz'   : lambda x : HZ2WAVENUM        * x,
                }
         try:
             self.converter = conv[str(unit)]
@@ -66,7 +68,7 @@ class RateView(QGroupBox):
                                 QDoubleSpinBox, QStringListModel
 
         # Rate or lifetime chooser
-        self.rate = QRadioButton('Rate (1/ps)', self)
+        self.rate = QRadioButton('Rate (THz)', self)
         self.lifetime = QRadioButton('Lifetime (ps)', self)
 
         # Box containing value
@@ -128,5 +130,5 @@ class RateView(QGroupBox):
 
     def setLifetimeModel(self):
         '''Change the model to use the lifetime'''
-        self.model.setConverter('1/ps')
+        self.model.setConverter('THz')
 
