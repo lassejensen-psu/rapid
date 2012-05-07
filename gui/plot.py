@@ -35,7 +35,10 @@ class Plot(QwtPlot):
         self.data.setRenderHint(QwtPlotCurve.RenderAntialiased)
         self.data.setPen(QPen(Qt.blue))
         self.data.attach(self)
- 
+
+        # Make sure the plot is wide enough
+        self.setMinimumWidth(800)
+
     #######
     # SLOTS
     #######

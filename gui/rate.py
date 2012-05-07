@@ -7,7 +7,7 @@ HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
 class Rate(QObject):
     '''Class to hold all information about the function'''
 
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
 
@@ -53,7 +53,7 @@ class Rate(QObject):
 class RateView(QGroupBox):
     '''The box containing the rate value'''
 
-    def __init__(self, title = 'Rate', parent = 0):
+    def __init__(self, title = 'Rate', parent = None):
         '''Initiallize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)

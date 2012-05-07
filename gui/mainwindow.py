@@ -3,9 +3,9 @@ from sys import argv, stderr
 from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget
 from plot import Plot
-from valuebox import ValueBox
 from rate import RateView
 from exchange import ExchangeView
+from peak import PeakView
 from controller import Controller
 
 class MainWindow(QMainWindow):
@@ -17,12 +17,6 @@ class MainWindow(QMainWindow):
         self._createtWidgets()
         self._initUI()
         #self._makeConnections()
-
-        # Set the default function to be sin
-        #self.functionField.setText("a*sin(b*x+c)+d")
-        #self.plotButton.clicked.emit(True)
-        #self.vbox[0].changeParameter(0)
-        #self.vbox[1].changeParameter(1)
 
         # Default to rate in units of ps
         self.rate.rate.click()
@@ -40,32 +34,27 @@ class MainWindow(QMainWindow):
 
         # Make the views
         self.plot = Plot(self)
-        self.vbox = [ValueBox(self, 'Parameter Picker 1', 0),
-                     ValueBox(self, 'Parameter Picker 2', 1)]
         self.rate = RateView(parent=self)
         self.exchange = ExchangeView(parent=self)
-        #self.peak_data = PeakData(self)
+        self.peak = PeakView(parent=self)
 
         # Create the model controller
         self.control = Controller(self)
 
         # Attach models to the views
-        self.vbox[0].setModel(self.control)
-        self.vbox[1].setModel(self.control)
         self.rate.setModel(self.control.rate)
         self.exchange.setModel(self.control.exchange, self.control.numpeaks)
+        self.peak.setModel(self.control.peak)
 
         # Init the UI of all the views
-        self.vbox[0].initUI()
-        self.vbox[1].initUI()
         self.rate.initUI()
         self.exchange.initUI()
+        self.peak.initUI()
 
         # Last, make inter-view connections
-        #self.vbox[0].makeConnections()
-        #self.vbox[1].makeConnections()
         self.rate.makeConnections()
         self.exchange.makeConnections()
+        self.peak.makeConnections()
 
     def _initUI(self):
         '''Sets up the layout of the window'''
@@ -79,21 +68,13 @@ class MainWindow(QMainWindow):
         params = QVBoxLayout()
         params.addWidget(self.rate)
         params.addWidget(self.exchange)
+        params.addWidget(self.peak)
 
         # Add the parameter dialog
         self.mainLayout.addLayout(params)
 
-        # Add the value box and plot
-        vbox_plot = QVBoxLayout()
-        for i in xrange(2):
-            vbox_plot.addWidget(self.vbox[i])
-        #funcLay = QHBoxLayout()
-        #funcLay.addWidget(QLabel('Enter a function: f(x) = '))
-        #funcLay.addWidget(self.functionField)
-        #funcLay.addWidget(self.plotButton)
-        #self.mainLayout.addLayout(funcLay)
-        vbox_plot.addWidget(self.plot)
-        self.mainLayout.addLayout(vbox_plot)
+        # Add the plot 
+        self.mainLayout.addWidget(self.plot)
 
         # Add the widgets to the central widget
         self.centralWidget().setLayout(self.mainLayout)

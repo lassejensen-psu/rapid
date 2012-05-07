@@ -14,7 +14,7 @@ raterole = Qt.UserRole+1
 class ExchangeView(QGroupBox):
     '''The box containing the rate value'''
 
-    def __init__(self, title = 'Peak Exchanges', parent = 0):
+    def __init__(self, title = 'Peak Exchange Matrix', parent = None):
         '''Initiallize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
@@ -140,7 +140,7 @@ class ExchangeView(QGroupBox):
 class NumPeaks(QObject):
     '''Class to hold all information about the function'''
 
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
 
@@ -167,7 +167,7 @@ class NumPeaks(QObject):
 class ExchangeModel(QObject):
     '''Class to hold all information about the function'''
 
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
         self.matrix = zeros((4,4))

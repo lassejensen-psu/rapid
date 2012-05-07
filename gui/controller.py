@@ -1,5 +1,5 @@
 from PyQt4.QtCore import pyqtSignal, QObject
-#from peak_data_model import PeakData
+from peak import PeakModel
 from exchange import ExchangeModel, NumPeaks
 from rate import Rate
 
@@ -13,6 +13,7 @@ class Controller(QObject):
         self.rate = Rate(self)
         self.numpeaks = NumPeaks(self)
         self.exchange = ExchangeModel(self)
+        self.peak = PeakModel(self)
         self._makeConnections()
 
 
