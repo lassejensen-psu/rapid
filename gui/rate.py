@@ -17,6 +17,8 @@ class Rate(QObject):
         self.converter = lambda x: x
         self.lunits = QStringListModel(QString('s ns ps fs').split(' '))
         self.runits = QStringListModel(QString('Hz GHz THz PHz').split(' '))
+        self.unit = 'THz'
+        self.method = ''
 
     def setConverter(self, unit):
         '''Sets the function to perform rate conversion to cm^{-1}'''
@@ -126,7 +128,7 @@ class RateView(QGroupBox):
 
     def updateRate(self):
         '''Updates the rate of the text box'''
-        self.rate_value.setText('{0:.3g}'.format(self.model.rate))
+        self.rate_value.setText('{0:.3G}'.format(self.model.rate))
 
     def emitRate(self):
         '''Converts the text to a float and emits'''
@@ -134,16 +136,72 @@ class RateView(QGroupBox):
 
     def updateUnit(self):
         '''Update for a change of unit'''
+        # Convert unit appropriately
         if self.rate.isChecked():
-            if
+            if self.model.unit == 'Hz':
+                conv = { 'GHz' : 1E-9,
+                         'THz' : 1E-12,
+                         'PHz' : 1E-15 }
+            elif self.model.unit == 'GHz':
+                conv = { 'Hz'  : 1E9,
+                         'THz' : 1E-3,
+                         'PHz' : 1E-6 }
+            elif self.model.unit == 'THz':
+                conv = { 'Hz'  : 1E12,
+                         'GHz' : 1E3,
+                         'PHz' : 1E-3 }
+            elif self.model.unit == 'PHz':
+                conv = { 'Hz'  : 1E15,
+                         'GHz' : 1E6,
+                         'THz' : 1E3 }
+            else:
+                conv = { ''    : 1,
+                         'Hz'  : 1, 
+                         'GHz' : 1, 
+                         'THz' : 1, 
+                         'PHz' : 1, }
         else:
+            if self.model.unit == 's':
+                conv = { 'ns' : 1E9,
+                         'ps' : 1E12,
+                         'fs' : 1E15 }
+            elif self.model.unit == 'ns':
+                conv = { 's'  : 1E-9,
+                         'ps' : 1E3,
+                         'fs' : 1E6 }
+            elif self.model.unit == 'ps':
+                conv = { 's'  : 1E-12,
+                         'ns' : 1E-3,
+                         'fs' : 1E3 }
+            elif self.model.unit == 'fs':
+                conv = { 's'  : 1E-15,
+                         'ns' : 1E-6,
+                         'ps' : 1E-3 }
+            else:
+                conv = { ''   : 1,
+                         's'  : 1, 
+                         'ns' : 1, 
+                         'ps' : 1, 
+                         'fs' : 1, }
+        try:
+            self.model.setRate(self.rate_value.text().toFloat()[0]
+                             * conv[str(self.unit.currentText())])
+        except KeyError:
+            pass
+
+        # Save the new unit
+        self.model.unit = str(self.unit.currentText())
 
     def setRateModel(self):
         '''Change the model to use the rate'''
+        if self.model.method == 'rate':
+            return
+        self.model.method = 'rate'
         indx = self.unit.currentIndex()
         self.unit.setModel(self.model.runits)
+        self.model.unit = str(self.unit.itemText(indx))
         self.unit.setCurrentIndex(indx)
-        self.model.setConverter(str(self.unit.currentText()))
+        self.model.setConverter(self.model.unit)
         try:
             self.model.setRate(1/self.rate_value.text().toFloat()[0])
         except ZeroDivisionError:
@@ -151,10 +209,14 @@ class RateView(QGroupBox):
 
     def setLifetimeModel(self):
         '''Change the model to use the lifetime'''
+        if self.model.method == 'lifetime':
+            return
+        self.model.method = 'lifetime'
         indx = self.unit.currentIndex()
         self.unit.setModel(self.model.lunits)
+        self.model.unit = str(self.unit.itemText(indx))
         self.unit.setCurrentIndex(indx)
-        self.model.setConverter(str(self.unit.currentText()))
+        self.model.setConverter(self.model.unit)
         try:
             self.model.setRate(1/self.rate_value.text().toFloat()[0])
         except ZeroDivisionError:

@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         # Default to rate in units of ps
         self.rate.rate.click()
         self.rate.unit.setCurrentIndex(2)
-        self.rate.rate_value.setText("1.54")
+        self.rate.rate_value.setText("1.540")
         # Set initial number of peaks to 2
         self.exchange.numpeaks[0].toggle()
         # Set matrix to symmetric by default
