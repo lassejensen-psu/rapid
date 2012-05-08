@@ -34,9 +34,7 @@ class ExchangeView(QGroupBox):
         self.exchooser = QComboBox(self)
         # Exchange value
         self.exvalue = QLineEdit(self)
-        validate = QDoubleValidator()
-        validate.setRange(0.0, 1.0, 3)
-        self.exvalue.setValidator(validate)
+        self.exvalue.setValidator(QDoubleValidator(0.0, 1.0, 3, self.exvalue))
 
     def makeConnections(self):
         '''Connect the widgets together'''

@@ -114,18 +114,14 @@ class PeakPage(QWidget):
         self.newGG     = QLineEdit(self)
         self.newH      = QLineEdit(self)
 
-        val = QDoubleValidator()
-        val.setRange(300.0, 3000.0, 1)
-        self.inputpeak.setValidator(val)
-        val = QDoubleValidator()
-        val.setRange(0.0, 100.0, 3)
-        self.inputGL.setValidator(val)
-        val = QDoubleValidator()
-        val.setRange(0.0, 100.0, 3)
-        self.inputGG.setValidator(val)
-        val = QDoubleValidator()
-        val.setRange(0.0, 1.0, 3)
-        self.inputH.setValidator(val)
+        self.inputpeak.setValidator(QDoubleValidator(300.0, 3000.0, 1,
+                                                     self.inputpeak))
+        self.inputGL.setValidator(QDoubleValidator(0.0, 100.0, 3,
+                                                   self.inputGL))
+        self.inputGG.setValidator(QDoubleValidator(0.0, 100.0, 3,
+                                                   self.inputGG))
+        self.inputH.setValidator(QDoubleValidator(0.0, 1.0, 3,
+                                                  self.inputH))
 
         self.newpeak.setReadOnly(True)
         self.newGL.setReadOnly(True)

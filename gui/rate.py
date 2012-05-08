@@ -77,7 +77,7 @@ class RateView(QGroupBox):
 
         # Box containing value
         self.rate_value = QLineEdit(self)
-        validate = QDoubleValidator()
+        validate = QDoubleValidator(self.rate_value)
         validate.setDecimals(3)
         validate.setBottom(0.0)
         self.rate_value.setValidator(validate)
