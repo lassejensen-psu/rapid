@@ -16,18 +16,16 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self._createtWidgets()
         self._initUI()
+        self._makeConnections()
 
         # Default to rate in units of ps
         self.rate.rate.click()
-        self.rate.rate_value.setValue(1.54)
-
+        self.rate.unit.setCurrentIndex(2)
+        self.rate.rate_value.setText("1.54")
         # Set initial number of peaks to 2
-        # Doing it twice seems to fix a bug
-        self.exchange.numpeaks.setValue(3)
-        self.exchange.numpeaks.setValue(2)
+        self.exchange.numpeaks[0].toggle()
         # Set matrix to symmetric by default
         self.exchange.symmetry.setChecked(True)
-        self._makeConnections()
 
     def _createtWidgets(self):
         '''Creates all the widgets'''

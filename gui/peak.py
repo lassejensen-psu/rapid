@@ -1,6 +1,6 @@
 from PyQt4.QtCore import pyqtSignal, QObject
 from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
-                        QDoubleSpinBox, QLabel, QGridLayout
+                        QDoubleValidator, QLabel, QGridLayout
 
 class PeakView(QTabWidget):
     '''Class to display the peak information'''
@@ -25,22 +25,22 @@ class PeakView(QTabWidget):
         self.addTab(self.pages[1], self.pages[1].title)
         self.npeaks = 2
         # Fill the pages with some default values
-        self.pages[0].inputpeak.setValue(self.model.peaks[0])
-        self.pages[0].inputGL.setValue(self.model.GL[0])
-        self.pages[0].inputGG.setValue(self.model.GG[0])
-        self.pages[0].inputH.setValue(self.model.h[0])
-        self.pages[1].inputpeak.setValue(self.model.peaks[1])
-        self.pages[1].inputGL.setValue(self.model.GL[1])
-        self.pages[1].inputGG.setValue(self.model.GG[1])
-        self.pages[1].inputH.setValue(self.model.h[1])
-        self.pages[2].inputpeak.setValue(self.model.peaks[2])
-        self.pages[2].inputGL.setValue(self.model.GL[2])
-        self.pages[2].inputGG.setValue(self.model.GG[2])
-        self.pages[2].inputH.setValue(self.model.h[2])
-        self.pages[3].inputpeak.setValue(self.model.peaks[3])
-        self.pages[3].inputGL.setValue(self.model.GL[3])
-        self.pages[3].inputGG.setValue(self.model.GG[3])
-        self.pages[3].inputH.setValue(self.model.h[3])
+        self.pages[0].inputpeak.setText('{0:.1f}'.format(self.model.peaks[0]))
+        self.pages[0].inputGL.setText('{0:.3f}'.format(self.model.GL[0]))
+        self.pages[0].inputGG.setText('{0:.3f}'.format(self.model.GG[0]))
+        self.pages[0].inputH.setText('{0:.3f}'.format(self.model.h[0]))
+        self.pages[1].inputpeak.setText('{0:.1f}'.format(self.model.peaks[1]))
+        self.pages[1].inputGL.setText('{0:.3f}'.format(self.model.GL[1]))
+        self.pages[1].inputGG.setText('{0:.3f}'.format(self.model.GG[1]))
+        self.pages[1].inputH.setText('{0:.3f}'.format(self.model.h[1]))
+        self.pages[2].inputpeak.setText('{0:.1f}'.format(self.model.peaks[2]))
+        self.pages[2].inputGL.setText('{0:.3f}'.format(self.model.GL[2]))
+        self.pages[2].inputGG.setText('{0:.3f}'.format(self.model.GG[2]))
+        self.pages[2].inputH.setText('{0:.3f}'.format(self.model.h[2]))
+        self.pages[3].inputpeak.setText('{0:.1f}'.format(self.model.peaks[3]))
+        self.pages[3].inputGL.setText('{0:.3f}'.format(self.model.GL[3]))
+        self.pages[3].inputGG.setText('{0:.3f}'.format(self.model.GG[3]))
+        self.pages[3].inputH.setText('{0:.3f}'.format(self.model.h[3]))
 
     def makeConnections(self):
         '''Connect all the contained widgets togeter'''
@@ -105,23 +105,27 @@ class PeakPage(QWidget):
 
     def _createWidgets(self):
         '''Create the contained widgets'''
-        self.inputpeak = QDoubleSpinBox(self)
-        self.inputGL   = QDoubleSpinBox(self)
-        self.inputGG   = QDoubleSpinBox(self)
-        self.inputH    = QDoubleSpinBox(self)
+        self.inputpeak = QLineEdit(self)
+        self.inputGL   = QLineEdit(self)
+        self.inputGG   = QLineEdit(self)
+        self.inputH    = QLineEdit(self)
         self.newpeak   = QLineEdit(self)
         self.newGL     = QLineEdit(self)
         self.newGG     = QLineEdit(self)
         self.newH      = QLineEdit(self)
 
-        self.inputpeak.setRange(300.0, 3000.0)
-        self.inputGL.setRange(0.0, 100.0)
-        self.inputGG.setRange(0.0, 100.0)
-        self.inputH.setRange(0.0, 1.0)
-        self.inputpeak.setDecimals(3)
-        self.inputGL.setDecimals(3)
-        self.inputGG.setDecimals(3)
-        self.inputH.setDecimals(3)
+        val = QDoubleValidator()
+        val.setRange(300.0, 3000.0, 1)
+        self.inputpeak.setValidator(val)
+        val = QDoubleValidator()
+        val.setRange(0.0, 100.0, 3)
+        self.inputGL.setValidator(val)
+        val = QDoubleValidator()
+        val.setRange(0.0, 100.0, 3)
+        self.inputGG.setValidator(val)
+        val = QDoubleValidator()
+        val.setRange(0.0, 1.0, 3)
+        self.inputH.setValidator(val)
 
         self.newpeak.setReadOnly(True)
         self.newGL.setReadOnly(True)
@@ -153,14 +157,14 @@ class PeakPage(QWidget):
 
     def _makeConnections(self):
         '''Connect the conatined widgets together'''
-        self.inputpeak.valueChanged.connect(self.inputParamsChanged)
-        self.inputGL.valueChanged.connect(self.inputParamsChanged)
-        self.inputGG.valueChanged.connect(self.inputParamsChanged)
-        self.inputH.valueChanged.connect(self.inputParamsChanged)
+        self.inputpeak.editingFinished.connect(self.inputParamsChanged)
+        self.inputGL.editingFinished.connect(self.inputParamsChanged)
+        self.inputGG.editingFinished.connect(self.inputParamsChanged)
+        self.inputH.editingFinished.connect(self.inputParamsChanged)
 
     def viewNewParams(self, p, GL, GG, h):
         '''View the new parameters after exchange'''
-        self.newpeak.setText('{0:.3f}'.format(p))
+        self.newpeak.setText('{0:.1f}'.format(p))
         self.newGL.setText('{0:.3f}'.format(GL))
         self.newGG.setText('{0:.3f}'.format(GG))
         self.newH.setText('{0:.3f}'.format(h))
@@ -172,10 +176,10 @@ class PeakPage(QWidget):
     def inputParamsChanged(self):
         '''Collects the parameters from this page and broadcasts them'''
         self.changeInputParams.emit(self.ID,
-                                    self.inputpeak.value(),
-                                    self.inputGL.value(),
-                                    self.inputGG.value(),
-                                    self.inputH.value())
+                                    self.inputpeak.text().toFloat()[0],
+                                    self.inputGL.text().toFloat()[0],
+                                    self.inputGG.text().toFloat()[0],
+                                    self.inputH.text().toFloat()[0])
 
     #########
     # SIGNALS
@@ -191,7 +195,7 @@ class PeakModel(QObject):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
         self.npeaks = 0
-        self.peaks    = [2000.0, 2000.0, 2000.0, 2000.0]
+        self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]
         self.GL       = [5.0, 5.0, 5.0, 5.0]
         self.GG       = [5.0, 5.0, 5.0, 5.0]
         self.h        = [1.0, 1.0, 1.0, 1.0]

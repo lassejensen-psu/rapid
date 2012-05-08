@@ -1,8 +1,8 @@
 from __future__ import division
-from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant
+from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant, QRegExp
 from PyQt4.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
-                        QSpinBox, QComboBox, QStringListModel, QCheckBox, \
-                        QDoubleSpinBox, QGridLayout
+                        QLineEdit, QComboBox, QStringListModel, QCheckBox, \
+                        QGridLayout, QDoubleValidator, QRadioButton
 from numpy.testing import assert_approx_equal
 from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
 from math import pi
@@ -23,8 +23,9 @@ class ExchangeView(QGroupBox):
     def _createWidgets(self):
         '''Create the widgets contained in this box'''
         # Peak number chooser
-        self.numpeaks = QSpinBox(self)
-        self.numpeaks.setRange(2, 4)
+        self.numpeaks = [QRadioButton("2"),
+                         QRadioButton("3"),
+                         QRadioButton("4")]
         # Make 4x4 matrix of QLabels
         self.exview = [[QLabel(self) for i in xrange(4)] for j in xrange(4)]
         # Enforce symmetry button
@@ -32,38 +33,38 @@ class ExchangeView(QGroupBox):
         # Exchange picker
         self.exchooser = QComboBox(self)
         # Exchange value
-        self.exvalue = QDoubleSpinBox(self)
-        self.exvalue.setDecimals(3)
-        self.exvalue.setRange(0.0, 1.0)
-        self.exvalue.setSingleStep(0.1)
+        self.exvalue = QLineEdit(self)
+        validate = QDoubleValidator()
+        validate.setRange(0.0, 1.0, 3)
+        self.exvalue.setValidator(validate)
 
     def makeConnections(self):
         '''Connect the widgets together'''
 
-        # When the number of peaks is changed, broadcast change model
-        self.numpeaks.valueChanged.connect(self.npmodel.setNumPeaks)
-
         # When the table has been resixed, tidy it up
         self.matrix.matrixChanged.connect(self.resetMatrix)
-
         # If the check state changed, change the data model
         self.symmetry.stateChanged.connect(self.changeDataModel)
-        self.numpeaks.valueChanged.connect(self.changeDataModel)
-
+        self.numpeaks[0].clicked.connect(self.changeDataModel)
+        self.numpeaks[1].clicked.connect(self.changeDataModel)
+        self.numpeaks[2].clicked.connect(self.changeDataModel)
         # Attach the chooser to an exchange rate
         self.exchooser.currentIndexChanged.connect(self.attachExchange)
-
         # If the exchange rate is changed, update the matrix
-        self.exvalue.valueChanged.connect(self.newExchange)
+        self.exvalue.editingFinished.connect(self.newExchange)
 
     def initUI(self):
         '''Lays out the widgets'''
         nums = QHBoxLayout()
         nums.addWidget(QLabel("Number of Peaks: "))
-        nums.addWidget(self.numpeaks)
+        nums.addWidget(self.numpeaks[0])
+        nums.addWidget(self.numpeaks[1])
+        nums.addWidget(self.numpeaks[2])
         val = QHBoxLayout()
         val.addWidget(QLabel("Exchange: "))
+        val.addStretch()
         val.addWidget(self.exchooser)
+        self.exvalue.setMaximumWidth(50)
         val.addWidget(self.exvalue)
         ex = QGridLayout()
         for i in xrange(4):
@@ -85,10 +86,16 @@ class ExchangeView(QGroupBox):
     # SLOTS
     #######
 
-    def newExchange(self, value):
+    def newExchange(self):
         '''Prepares an exchange value to be broadcasted'''
+        value = round(self.exvalue.text().toFloat()[0], 3)
         indx = self.exchooser.currentIndex()
-        npeaks = self.numpeaks.value()
+        if self.numpeaks[0].isChecked():
+            npeaks = 2
+        elif self.numpeaks[1].isChecked():
+            npeaks = 3
+        elif self.numpeaks[2].isChecked():
+            npeaks = 4
         self.matrix.updateExchange(value, indx, npeaks)
 
     def resetMatrix(self):
@@ -114,7 +121,13 @@ class ExchangeView(QGroupBox):
         '''Change the matrix from symmetric to not or vice versa'''
 
         # Change the model for the combo box
-        npeaks = self.npmodel.numPeaks
+        if self.numpeaks[0].isChecked():
+            npeaks = 2
+        elif self.numpeaks[1].isChecked():
+            npeaks = 3
+        elif self.numpeaks[2].isChecked():
+            npeaks = 4
+        self.npmodel.setNumPeaks(npeaks)
         self.matrix.sym = self.symmetry.isChecked()
         if self.matrix.sym:
             self.exchooser.setModel(self.matrix.symex[npeaks])
@@ -127,7 +140,7 @@ class ExchangeView(QGroupBox):
     def attachExchange(self, indx):
         '''Attach a new exchange rate to the chooser'''
         r = self.matrix.symrate if self.matrix.sym else self.matrix.unsymrate
-        self.exvalue.setValue(r[self.npmodel.numPeaks][indx])
+        self.exvalue.setText('{0:.3f}'.format(r[self.npmodel.numPeaks][indx]))
 
     #########
     # SIGNALS
