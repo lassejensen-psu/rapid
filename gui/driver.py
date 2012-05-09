@@ -23,4 +23,5 @@ def run_gui():
     app = QApplication(argv)
     window = MainWindow()
     window.show()
+    window.raise_()
     return app.exec_()
