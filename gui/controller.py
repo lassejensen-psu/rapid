@@ -3,6 +3,7 @@ from numpy import ndarray, asarray
 from peak import PeakModel
 from exchange import ExchangeModel, NumPeaks
 from rate import Rate
+from scale import Scale
 from common import spectrum
 
 
@@ -16,6 +17,7 @@ class Controller(QObject):
         self.numpeaks = NumPeaks(self)
         self.exchange = ExchangeModel(self)
         self.peak = PeakModel(self)
+        self.scale = Scale(self)
         self._makeConnections()
 
     def _makeConnections(self):
@@ -30,6 +32,9 @@ class Controller(QObject):
         self.rate.rateChanged.connect(self.setDataForPlot)
         self.exchange.matrixChanged.connect(self.setDataForPlot)
         self.peak.inputParamsChanged.connect(self.setDataForPlot)
+
+        # Change the plot scale
+        self.scale.scaleChanged.connect(self.changeScale)
 
     #######
     # SLOTS
@@ -56,9 +61,19 @@ class Controller(QObject):
         self.plotSpectrum.emit(omega, I)
         self.peak.setNewParams(*newParams)
 
+    def changeScale(self):
+        '''Emit the new scale to use'''
+        self.newXLimits.emit(self.scale.xmin,
+                             self.scale.xmax,
+                             self.scale.reverse
+                            )
+        
     #########
     # SIGNALS
     #########
 
     # Plot the data
     plotSpectrum = pyqtSignal(ndarray, ndarray)
+
+    # Change the scale
+    newXLimits = pyqtSignal(int, int, bool)

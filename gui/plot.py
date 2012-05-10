@@ -1,6 +1,7 @@
 from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve
 from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
+from numpy import array
 from common import normalize
 
 class Plot(QwtPlot):
@@ -19,9 +20,8 @@ class Plot(QwtPlot):
             self.setTitle(title)
 
         # Set the axes for the intial data
-        self.setAxisTitle(self.xBottom, "x")
-        self.setAxisScale(self.xBottom, 1950.0, 2050.0)
-        self.setAxisTitle(self.yLeft, "f(x)")
+        self.setAxisTitle(self.xBottom, "Frequency (Wavenumbers)")
+        self.setAxisTitle(self.yLeft, "Intensity (Normalized)")
         self.setAxisScale(self.yLeft, -0.1, 1.1)
 
         # Make the background white and the line thick enough to see
@@ -37,6 +37,12 @@ class Plot(QwtPlot):
         self.data.setPen(QPen(Qt.blue))
         self.data.attach(self)
 
+        # The raw (experimental) data, if any
+        self.raw = QwtPlotCurve()
+        self.raw.setRenderHint(QwtPlotCurve.RenderAntialiased)
+        self.raw.setPen(QPen(Qt.green))
+        self.raw.attach(self)
+
         # Make sure the plot is wide enough
         self.setMinimumWidth(800)
 
@@ -48,6 +54,27 @@ class Plot(QwtPlot):
         '''Plot the given function'''
         y = normalize(y)
         self.data.setData(x, y)
+        self.replot()
+
+    def plotRawData(self, x, y):
+        '''Plot the raw data'''
+        y = normalize(y)
+        # Clip the data to only the plotting window (to remove baseline)
+        combined = array([[i, j] for i, j in zip(x, y)])
+        s = self.axisScaleDiv(self.xBottom)
+        xlim = s.lowerBound(), s.upperBound()
+        if xlim[0] > xlim[1]:
+            xlim[0], xlim[1] = xlim[1], xlim[0]
+        combined = clip(combinded, xlim)
+        self.raw.setData(combined[:,0], combined[:1])
+        self.replot()
+
+    def changeScale(self, min, max, reversed):
+        '''Change the axis scale'''
+        if reversed:
+            self.setAxisScale(self.xBottom, max, min)
+        else:
+            self.setAxisScale(self.xBottom, min, max)
         self.replot()
 
     #########
