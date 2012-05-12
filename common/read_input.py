@@ -1,5 +1,5 @@
 from __future__ import print_function
-from sys import exit, stdout
+from sys import stdout
 from math import pi
 from numpy import array, loadtxt
 from input_reader import InputReader, SUPPRESS, ReaderError, \
@@ -96,11 +96,12 @@ def read_input(input_file):
 
     # Either all or none of the numbers must be given explicitly
     if not (all(num_given) or not any(num_given)):
-        exit('All or none of the peaks must be given numbers explicitly')
+        raise ReaderError('All or none of the peaks must '
+                          'be given numbers explicitly')
     # If the numbers were give, make sure there are no duplicates
     if all(num_given):
         if len(num) != len(set(num)):
-            exit('Duplicate peaks cannot be given')
+            raise ReaderError('Duplicate peaks cannot be given')
     # If none were given, number automatically
     else:
         num = range(1, len(num)+1, 1)
@@ -121,12 +122,12 @@ def read_input(input_file):
         for exchange in args.exchange:
             p1 = exchange[0]
             if p1 not in num:
-                exit(string.format(p1))
+                raise ReaderError(string.format(p1))
             p2 = exchange[1]
             if p2 not in num:
-                exit(string.format(p2))
+                raise ReaderError(string.format(p2))
             if p1 == p2:
-                exit('Self exchange is not allowed')
+                raise ReaderError('Self exchange is not allowed')
             rate = exchange[2]
             # Offset the peak number by one to match python indicies
             ex.append([p1-1, p2-1])
