@@ -2,7 +2,7 @@ from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve
 from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
 from numpy import array
-from common import normalize
+from common import normalize, clip
 
 class Plot(QwtPlot):
     '''A plot'''
@@ -34,13 +34,13 @@ class Plot(QwtPlot):
         # Create the XY data points
         self.data = QwtPlotCurve()
         self.data.setRenderHint(QwtPlotCurve.RenderAntialiased)
-        self.data.setPen(QPen(Qt.blue))
+        self.data.setPen(QPen(Qt.blue, 2))
         self.data.attach(self)
 
         # The raw (experimental) data, if any
         self.raw = QwtPlotCurve()
         self.raw.setRenderHint(QwtPlotCurve.RenderAntialiased)
-        self.raw.setPen(QPen(Qt.green))
+        self.raw.setPen(QPen(Qt.darkGreen, 2))
         self.raw.attach(self)
 
         # Make sure the plot is wide enough
@@ -65,9 +65,15 @@ class Plot(QwtPlot):
         xlim = s.lowerBound(), s.upperBound()
         if xlim[0] > xlim[1]:
             xlim[0], xlim[1] = xlim[1], xlim[0]
-        combined = clip(combinded, xlim)
-        self.raw.setData(combined[:,0], combined[:1])
+        combined = clip(combined, xlim)
+        self.raw.setData(combined[:,0], combined[:,1])
+        if not self.raw.isVisible():
+            self.raw.show()
         self.replot()
+
+    def clearRawData(self):
+        '''Clear the raw data'''
+        self.raw.hide()
 
     def changeScale(self, min, max, reversed):
         '''Change the axis scale'''

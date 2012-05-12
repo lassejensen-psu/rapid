@@ -1,7 +1,11 @@
 from __future__ import division
 from sys import argv, stderr
+from os import environ
 from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
-                        QHBoxLayout, QLabel, QPushButton, QTabWidget
+                        QHBoxLayout, QLabel, QPushButton, QTabWidget, \
+                        QAction, QKeySequence, QFileDialog
+from PyQt4.Qt import qApp
+from numpy import loadtxt
 from plot import Plot
 from rate import RateView
 from exchange import ExchangeView
@@ -106,15 +110,66 @@ class MainWindow(QMainWindow):
         # Get the menu bar object
         self.menu = self.menuBar()
         self.fileMenu = self.menu.addMenu('&File')
-        self.fileMenu.addAction('Import XY data...')
-        self.fileMenu.addAction('Export XY data...')
-        self.fileMenu.addAction('Export as script...')
+
+        # Save action
+        save = QAction('&Save', self)
+        save.setShortcuts(QKeySequence.Save)
+        save.triggered.connect(self.saveToInput)
+        self.fileMenu.addAction(save)
+
+        # Open action
+        open = QAction('&Open', self)
+        open.setShortcuts(QKeySequence.Open)
+        open.triggered.connect(self.openFromInput)
+        self.fileMenu.addAction(open)
+
+        # Import action
+        imp = QAction('&Import raw XY data...', self)
+        imp.setShortcuts(QKeySequence('Ctrl+I'))
+        imp.triggered.connect(self.importXYData)
+        self.fileMenu.addAction(imp)
+
+        # Export action
+        exp = QAction('&Export calculated XY data...', self)
+        exp.setShortcuts(QKeySequence('Ctrl+E'))
+        exp.triggered.connect(self.exportXYData)
+        self.fileMenu.addAction(exp)
+
+        # Menu seperator
         self.fileMenu.addSeparator()
-        self.fileMenu.addAction('Exit')
+
+        # Quit action
+        quit = QAction('&Quit', self)
+        quit.setShortcuts(QKeySequence.Quit)
+        quit.triggered.connect(qApp.quit)
+        self.fileMenu.addAction(quit)
 
     #######
     # SLOTS
     #######
+
+    def saveToInput(self):
+        '''Save current settings to an input file'''
+        pass
+
+    def openFromInput(self):
+        '''Open parameters from an input file'''
+        pass
+
+    def exportXYData(self):
+        '''Export current spectrum to XY data'''
+        fileName = QFileDialog.getSaveFileName(self,
+                                               'Export calculated XY data', '',
+                                               'Data Files (*.txt *.data);;'
+                                               'All (*)')
+
+    def importXYData(self):
+        '''Import data from an XY file'''
+        fileName = QFileDialog.getOpenFileName(self, 'Import raw XY data', '',
+                                               'Data Files (*.txt *.data);;'
+                                               'All (*)')
+        rawData = loadtxt(str(fileName))
+        self.plot.plotRawData(rawData[:,0], rawData[:,1])
 
     #########
     # SIGNALS
