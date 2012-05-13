@@ -128,7 +128,10 @@ class RateView(QGroupBox):
 
     def updateRate(self):
         '''Updates the rate of the text box'''
-        self.rate_value.setText('{0:.3G}'.format(self.model.rate))
+        if 0.1 > self.model.rate or self.model.rate > 100:
+            self.rate_value.setText('{0:.3E}'.format(self.model.rate))
+        else:
+            self.rate_value.setText('{0:.3F}'.format(self.model.rate))
 
     def emitRate(self):
         '''Converts the text to a float and emits'''
@@ -184,6 +187,8 @@ class RateView(QGroupBox):
                          'ps' : 1, 
                          'fs' : 1, }
         try:
+            # Set the new converter, then change the rate
+            self.model.setConverter(str(self.unit.currentText()))
             self.model.setRate(self.rate_value.text().toFloat()[0]
                              * conv[str(self.unit.currentText())])
         except KeyError:
