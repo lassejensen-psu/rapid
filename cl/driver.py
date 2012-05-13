@@ -1,21 +1,14 @@
 from __future__ import print_function
 from sys import stderr, stdout
 from numpy import arange
+from common import spectrum, SpectrumError, ZMat, \
+                   numerics, write_data, save_script, read_input
+from plot import plot
 
 def run_non_interactive(input_file):
     '''Driver to calculate the spectra non-interactively
     (i.e. from the command line).
     '''
-    # Import needed functions.  Do so here to handle errors better
-    try:
-        from input_reader import ReaderError
-    except ImportError:
-        print("Cannot find input_reader module", file=stderr)
-        print("Find it at github.com/SethMMorton/input_reader", file=stderr)
-        return 1
-    from common import spectrum, SpectrumError, ZMat, \
-                       numerics, write_data, save_script, read_input
-    from plot import plot
 
     # Read in the input file that is given
     try:

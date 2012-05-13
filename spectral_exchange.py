@@ -26,6 +26,13 @@ if __name__ == '__main__':
         print('spectral_exchange requires scipy, so you should', file=stderr)
         print('install it using your favorite method', file=stderr)
         exit(1)
+    # Also try input_reader, since both branches need that
+    try:
+        from input_reader import ReaderError
+    except ImportError:
+        print("Cannot find input_reader module", file=stderr)
+        print("Find it at github.com/SethMMorton/input_reader", file=stderr)
+        exit(1)
 
     # If an argument was given, then run the non-interactive mode
     if len(argv) == 1:
