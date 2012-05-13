@@ -123,29 +123,43 @@ class MainWindow(QMainWindow):
         self.menu = self.menuBar()
         self.fileMenu = self.menu.addMenu('&File')
 
-        # Save action
-        save = QAction('&Save', self)
-        save.setShortcuts(QKeySequence.Save)
-        save.triggered.connect(self.saveToInput)
-        self.fileMenu.addAction(save)
-
         # Open action
         open = QAction('&Open', self)
         open.setShortcuts(QKeySequence.Open)
         open.triggered.connect(self.openFromInput)
         self.fileMenu.addAction(open)
 
+        # Save action
+        save = QAction('&Save', self)
+        save.setShortcuts(QKeySequence.Save)
+        save.triggered.connect(self.saveToInput)
+        self.fileMenu.addAction(save)
+
+        # Save action
+        saveas = QAction('Save As', self)
+        save.triggered.connect(self.saveToInputAs)
+        self.fileMenu.addAction(saveas)
+
+        # Menu seperator
+        self.fileMenu.addSeparator()
+
         # Import action
-        imp = QAction('&Import raw XY data...', self)
+        imp = QAction('&Import raw XY data', self)
         imp.setShortcuts(QKeySequence('Ctrl+I'))
         imp.triggered.connect(self.importXYData)
         self.fileMenu.addAction(imp)
 
         # Export action
-        exp = QAction('&Export calculated XY data...', self)
+        exp = QAction('&Export calculated XY data', self)
         exp.setShortcuts(QKeySequence('Ctrl+E'))
         exp.triggered.connect(self.exportXYData)
         self.fileMenu.addAction(exp)
+
+        # Make script action
+        scr = QAction('Make Sc&ript', self)
+        scr.setShortcuts(QKeySequence('Ctrl+R'))
+        scr.triggered.connect(self.makeScript)
+        self.fileMenu.addAction(scr)
 
         # Menu seperator
         self.fileMenu.addSeparator()
@@ -160,12 +174,21 @@ class MainWindow(QMainWindow):
     # SLOTS
     #######
 
-    def saveToInput(self):
-        '''Save current settings to an input file'''
-        pass
+    def clearRawData(self):
+        '''Clear the raw data from the plot'''
+        self.plot.clearRawData()
+        self.clear.setEnabled(False)
 
     def openFromInput(self):
         '''Open parameters from an input file'''
+        pass
+
+    def saveToInput(self):
+        '''Save current settings to current input file if available'''
+        pass
+
+    def saveToInputAs(self):
+        '''Save current settings to an input file of specified name'''
         pass
 
     def exportXYData(self):
@@ -192,10 +215,9 @@ class MainWindow(QMainWindow):
         self.plot.plotRawData(rawData[:,0], rawData[:,1])
         self.clear.setEnabled(True)
 
-    def clearRawData(self):
-        '''Clear the raw data from the plot'''
-        self.plot.clearRawData()
-        self.clear.setEnabled(False)
+    def makeScript(self):
+        '''Open parameters from an input file'''
+        pass
 
     #########
     # SIGNALS
