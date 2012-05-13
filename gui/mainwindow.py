@@ -148,19 +148,19 @@ class MainWindow(QMainWindow):
 
         # Import action
         imp = QAction('&Import raw XY data', self)
-        imp.setShortcuts(QKeySequence('Ctrl+I'))
+        imp.setShortcut(QKeySequence('Ctrl+I'))
         imp.triggered.connect(self.importXYData)
         self.fileMenu.addAction(imp)
 
         # Export action
         exp = QAction('&Export calculated XY data', self)
-        exp.setShortcuts(QKeySequence('Ctrl+E'))
+        exp.setShortcut(QKeySequence('Ctrl+E'))
         exp.triggered.connect(self.exportXYData)
         self.fileMenu.addAction(exp)
 
         # Make script action
         scr = QAction('Make Sc&ript', self)
-        scr.setShortcuts(QKeySequence('Ctrl+R'))
+        scr.setShortcut(QKeySequence('Ctrl+R'))
         scr.triggered.connect(self.makeScript)
         self.fileMenu.addAction(scr)
 
