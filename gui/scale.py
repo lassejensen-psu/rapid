@@ -15,6 +15,14 @@ class Scale(QObject):
         self.reverse = False
         self.domain = arange(1790, 2110, 0.5)
 
+    def getScale(self):
+        '''Returns the scale parameters'''
+        return self.xmin, self.xmax, self.reverse
+
+    def getDomain(self):
+        '''Returns the frequency domain'''
+        return self.domain
+
     #######
     # SLOTS
     #######
