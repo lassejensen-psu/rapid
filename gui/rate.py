@@ -13,7 +13,6 @@ class Rate(QObject):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
         self.rate = 0
-        self.wn_rate = 0
         self.converter = lambda x: x
         self.lunits = QStringListModel(QString('s ns ps fs').split(' '))
         self.runits = QStringListModel(QString('Hz GHz THz PHz').split(' '))
@@ -23,6 +22,7 @@ class Rate(QObject):
     def setConverter(self, unit):
         '''Sets the function to perform rate conversion to cm^{-1}'''
 
+        self.unit = str(unit)
         conv = {
                  'fs'   : lambda x : HZ2WAVENUM / ( 1E-15 * x ),
                  'ps'   : lambda x : HZ2WAVENUM / ( 1E-12 * x ),
@@ -34,9 +34,17 @@ class Rate(QObject):
                  'Hz'   : lambda x : HZ2WAVENUM        * x,
                }
         try:
-            self.converter = conv[str(unit)]
+            self.converter = conv[self.unit]
         except KeyError:
             pass # This happens when we set a new model.  Ignore
+
+    def getParams(self):
+        '''Returns the current rate parameters'''
+        return self.rate, self.unit
+
+    def getConvertedRate(self):
+        '''Returns the rate in wavenumbers'''
+        return self.converter(self.rate)
 
     #######
     # SLOTS
@@ -45,7 +53,6 @@ class Rate(QObject):
     def setRate(self, rate):
         '''Sets the rate and emits the result'''
         self.rate = rate
-        self.wn_rate = self.converter(self.rate)
         self.rateChanged.emit()
 
     #########
