@@ -70,7 +70,7 @@ class Controller(QObject):
         self.oldParams = self.peak.getParams()
         vib, GL, GG, h = self.oldParams
         # Don's plot if there is some error
-        if k == 0:
+        if k == 0 or k is None:
             return
         elif npeaks != len(vib):
             return
