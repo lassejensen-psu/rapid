@@ -26,22 +26,22 @@ class PeakView(QTabWidget):
         self.addTab(self.pages[1], self.pages[1].title)
         self.npeaks = 2
         # Fill the pages with some default values
-        self.pages[0].inputpeak.setText('{0:.1f}'.format(self.model.peaks[0]))
-        self.pages[0].inputGL.setText('{0:.3f}'.format(self.model.GL[0]))
-        self.pages[0].inputGG.setText('{0:.3f}'.format(self.model.GG[0]))
-        self.pages[0].inputH.setText('{0:.3f}'.format(self.model.h[0]))
-        self.pages[1].inputpeak.setText('{0:.1f}'.format(self.model.peaks[1]))
-        self.pages[1].inputGL.setText('{0:.3f}'.format(self.model.GL[1]))
-        self.pages[1].inputGG.setText('{0:.3f}'.format(self.model.GG[1]))
-        self.pages[1].inputH.setText('{0:.3f}'.format(self.model.h[1]))
-        self.pages[2].inputpeak.setText('{0:.1f}'.format(self.model.peaks[2]))
-        self.pages[2].inputGL.setText('{0:.3f}'.format(self.model.GL[2]))
-        self.pages[2].inputGG.setText('{0:.3f}'.format(self.model.GG[2]))
-        self.pages[2].inputH.setText('{0:.3f}'.format(self.model.h[2]))
-        self.pages[3].inputpeak.setText('{0:.1f}'.format(self.model.peaks[3]))
-        self.pages[3].inputGL.setText('{0:.3f}'.format(self.model.GL[3]))
-        self.pages[3].inputGG.setText('{0:.3f}'.format(self.model.GG[3]))
-        self.pages[3].inputH.setText('{0:.3f}'.format(self.model.h[3]))
+        #self.pages[0].inputpeak.setText('{0:.1f}'.format(self.model.peaks[0]))
+        #self.pages[0].inputGL.setText('{0:.3f}'.format(self.model.GL[0]))
+        #self.pages[0].inputGG.setText('{0:.3f}'.format(self.model.GG[0]))
+        #self.pages[0].inputH.setText('{0:.3f}'.format(self.model.h[0]))
+        #self.pages[1].inputpeak.setText('{0:.1f}'.format(self.model.peaks[1]))
+        #self.pages[1].inputGL.setText('{0:.3f}'.format(self.model.GL[1]))
+        #self.pages[1].inputGG.setText('{0:.3f}'.format(self.model.GG[1]))
+        #self.pages[1].inputH.setText('{0:.3f}'.format(self.model.h[1]))
+        #self.pages[2].inputpeak.setText('{0:.1f}'.format(self.model.peaks[2]))
+        #self.pages[2].inputGL.setText('{0:.3f}'.format(self.model.GL[2]))
+        #self.pages[2].inputGG.setText('{0:.3f}'.format(self.model.GG[2]))
+        #self.pages[2].inputH.setText('{0:.3f}'.format(self.model.h[2]))
+        #self.pages[3].inputpeak.setText('{0:.1f}'.format(self.model.peaks[3]))
+        #self.pages[3].inputGL.setText('{0:.3f}'.format(self.model.GL[3]))
+        #self.pages[3].inputGG.setText('{0:.3f}'.format(self.model.GG[3]))
+        #self.pages[3].inputH.setText('{0:.3f}'.format(self.model.h[3]))
 
     def makeConnections(self):
         '''Connect all the contained widgets togeter'''
@@ -172,11 +172,15 @@ class PeakPage(QWidget):
 
     def inputParamsChanged(self):
         '''Collects the parameters from this page and broadcasts them'''
-        self.changeInputParams.emit(self.ID,
-                                    self.inputpeak.text().toFloat()[0],
-                                    self.inputGL.text().toFloat()[0],
-                                    self.inputGG.text().toFloat()[0],
-                                    self.inputH.text().toFloat()[0])
+        vib = self.inputpeak.text().toFloat()
+        GL  = self.inputGL.text().toFloat()
+        GG  = self.inputGG.text().toFloat()
+        h   = self.inputH.text().toFloat()
+        # First check that float conversion was a success for all params
+        # Of not, don't pass on data
+        if not (vib[1] and GL[1] and GG[1] and h[1]):
+            return
+        self.changeInputParams.emit(self.ID, vib[0], GL[0], GG[0], h[0])
 
     #########
     # SIGNALS
@@ -192,10 +196,14 @@ class PeakModel(QObject):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
         self.npeaks = 0
-        self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]
-        self.GL       = [5.0, 5.0, 5.0, 5.0]
-        self.GG       = [5.0, 5.0, 5.0, 5.0]
-        self.h        = [1.0, 1.0, 1.0, 1.0]
+        #self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]
+        self.peaks    = [None, None, None, None]
+        self.GL       = [None, None, None, None]
+        #self.GL       = [5.0, 5.0, 5.0, 5.0]
+        self.GG       = [None, None, None, None]
+        #self.GG       = [5.0, 5.0, 5.0, 5.0]
+        self.h        = [None, None, None, None]
+        #self.h        = [1.0, 1.0, 1.0, 1.0]
         self.newpeaks = [0.0, 0.0, 0.0, 0.0]
         self.newGL    = [0.0, 0.0, 0.0, 0.0]
         self.newGG    = [0.0, 0.0, 0.0, 0.0]

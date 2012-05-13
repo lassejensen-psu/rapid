@@ -7,6 +7,7 @@ from numpy.testing import assert_approx_equal
 from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
 from math import pi
 from common import ZMat
+from error import error
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
 indexrole = Qt.UserRole
 raterole = Qt.UserRole+1
@@ -79,6 +80,27 @@ class ExchangeView(QGroupBox):
         '''Attaches models to the views.'''
         self.matrix = model
         self.npmodel = npmodel
+
+    def setNumPeaks(self, npeaks):
+        '''Manually set the number of peaks'''
+        if npeaks == 2:
+            self.numpeaks[0].toggle()
+        elif npeaks == 3:
+            self.numpeaks[1].toggle()
+        elif npeaks == 4:
+            self.numpeaks[2].toggle()
+        else:
+            error.showMessage('Only valid number of peaks is 2, 3, or 4')
+
+    def setMatrixSymmetry(self, sym):
+        '''Manually set the matrix symmetry'''
+        self.symmetry.setChecked(sym)
+
+    def setMatrix(self, Z):
+        '''Manually set the matrix elements with a numpy matrix'''
+        npeaks = self.npmodel.getNumPeaks()
+        self.matrix.matrix = Z[0:npeaks,0:npeaks]
+        self.matrix.setMatrix(npeaks)
 
     #######
     # SLOTS

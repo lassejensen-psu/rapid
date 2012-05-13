@@ -17,10 +17,10 @@ def run_gui():
         print("Cannot find PyQwt5", file=stderr)
         print("You must install this to run the GUI", file=stderr)
         return 1
-    from mainwindow import MainWindow
 
     # The actual event loop
     app = QApplication(argv)
+    from mainwindow import MainWindow
     window = MainWindow()
     window.show()
     window.raise_()
