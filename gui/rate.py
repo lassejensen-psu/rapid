@@ -12,11 +12,9 @@ class Rate(QObject):
     def __init__(self, parent = None):
         '''Initiallize the function class'''
         super(QObject, self).__init__(parent)
-        self.rate = 0
         self.converter = lambda x: x
         self.lunits = QStringListModel(QString('s ns ps fs').split(' '))
         self.runits = QStringListModel(QString('Hz GHz THz PHz').split(' '))
-        self.unit = 'THz'
         self.method = ''
 
     def setConverter(self, unit):
@@ -40,11 +38,19 @@ class Rate(QObject):
 
     def getParams(self):
         '''Returns the current rate parameters'''
-        return self.rate, self.unit
+        # Return None if rate is not yet defined
+        try:
+            return self.rate, self.unit
+        except AttributeError:
+            return None, None
 
     def getConvertedRate(self):
         '''Returns the rate in wavenumbers'''
-        return self.converter(self.rate)
+        # Return None if rate is not yet defined
+        try:
+            return self.converter(self.rate)
+        except AttributeError:
+            return None
 
     #######
     # SLOTS
@@ -129,38 +135,87 @@ class RateView(QGroupBox):
         '''Attaches models to the views'''
         self.model = model
 
+    def setRate(self, rate):
+        '''Set the rate manually'''
+        self.rate_value.setText(str(rate))
+        self.rate_value.returnPressed()
+
+    def setUnit(self, unit):
+        '''Set the unit manually'''
+        if unit == 's':
+            self.lifetime.click()
+            self.unit.setCurrentIndex(0)
+        elif unit == 'ns':
+            self.lifetime.click()
+            self.unit.setCurrentIndex(1)
+        elif unit == 'ps':
+            self.lifetime.click()
+            self.unit.setCurrentIndex(2)
+        elif unit == 'fs':
+            self.lifetime.click()
+            self.unit.setCurrentIndex(3)
+        if unit == 'Hz':
+            self.rate.click()
+            self.unit.setCurrentIndex(0)
+        elif unit == 'GHz':
+            self.rate.click()
+            self.unit.setCurrentIndex(1)
+        elif unit == 'THz':
+            self.rate.click()
+            self.unit.setCurrentIndex(2)
+        elif unit == 'PHz':
+            self.rate.click()
+            self.unit.setCurrentIndex(3)
+
     #######
     # SLOTS
     #######
 
     def updateRate(self):
         '''Updates the rate of the text box'''
-        if 0.1 > self.model.rate or self.model.rate > 100:
-            self.rate_value.setText('{0:.3E}'.format(self.model.rate))
+        # Do nothing if rate is not yet defined
+        try:
+            rate = self.model.rate
+        except AttributeError:
+            return
+        if 0.1 > rate or rate > 100:
+            self.rate_value.setText('{0:.3E}'.format(rate))
         else:
-            self.rate_value.setText('{0:.3F}'.format(self.model.rate))
+            self.rate_value.setText('{0:.3F}'.format(rate))
 
     def emitRate(self):
         '''Converts the text to a float and emits'''
-        self.model.setRate(self.rate_value.text().toFloat()[0])
+        # Do nothing if there is no number
+        newrate = self.rate_value.text().toFloat()
+        if newrate[1]:
+            self.model.setRate(newrate[0])
 
     def updateUnit(self):
         '''Update for a change of unit'''
+        # If there is no unit yet, just set it
+        try:
+            unit = self.model.unit
+        except AttributeError:
+            self.model.setConverter(str(self.unit.currentText()))
+            newrate = self.rate_value.text().toFloat()
+            if newrate[1]:
+                self.model.setRate(newrate[0])
+            return
         # Convert unit appropriately
         if self.rate.isChecked():
-            if self.model.unit == 'Hz':
+            if unit == 'Hz':
                 conv = { 'GHz' : 1E-9,
                          'THz' : 1E-12,
                          'PHz' : 1E-15 }
-            elif self.model.unit == 'GHz':
+            elif unit == 'GHz':
                 conv = { 'Hz'  : 1E9,
                          'THz' : 1E-3,
                          'PHz' : 1E-6 }
-            elif self.model.unit == 'THz':
+            elif unit == 'THz':
                 conv = { 'Hz'  : 1E12,
                          'GHz' : 1E3,
                          'PHz' : 1E-3 }
-            elif self.model.unit == 'PHz':
+            elif unit == 'PHz':
                 conv = { 'Hz'  : 1E15,
                          'GHz' : 1E6,
                          'THz' : 1E3 }
@@ -171,19 +226,19 @@ class RateView(QGroupBox):
                          'THz' : 1, 
                          'PHz' : 1, }
         else:
-            if self.model.unit == 's':
+            if unit == 's':
                 conv = { 'ns' : 1E9,
                          'ps' : 1E12,
                          'fs' : 1E15 }
-            elif self.model.unit == 'ns':
+            elif unit == 'ns':
                 conv = { 's'  : 1E-9,
                          'ps' : 1E3,
                          'fs' : 1E6 }
-            elif self.model.unit == 'ps':
+            elif unit == 'ps':
                 conv = { 's'  : 1E-12,
                          'ns' : 1E-3,
                          'fs' : 1E3 }
-            elif self.model.unit == 'fs':
+            elif unit == 'fs':
                 conv = { 's'  : 1E-15,
                          'ns' : 1E-6,
                          'ps' : 1E-3 }
@@ -196,8 +251,10 @@ class RateView(QGroupBox):
         try:
             # Set the new converter, then change the rate
             self.model.setConverter(str(self.unit.currentText()))
-            self.model.setRate(self.rate_value.text().toFloat()[0]
-                             * conv[str(self.unit.currentText())])
+            newrate = self.rate_value.text().toFloat()
+            if newrate[1]:
+                self.model.setRate(newrate[0]
+                                 * conv[str(self.unit.currentText())])
         except KeyError:
             pass
 
