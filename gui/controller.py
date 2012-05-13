@@ -48,6 +48,7 @@ class Controller(QObject):
         '''Assembles the data for plotting, calculates the spectrum, then emits'''
 
         # Assemble values
+        omega = self.scale.domain
         npeaks = self.numpeaks.numPeaks
         k = self.rate.wn_rate
         Z = self.exchange.matrix
@@ -56,13 +57,15 @@ class Controller(QObject):
         GG = asarray(self.peak.GG[:npeaks])
         h = asarray(self.peak.h[:npeaks])
         # Calculate spectrum
-        I, omega, newParams = spectrum(Z, k, vib, GL, GG, h)
+        I, newParams = spectrum(Z, k, vib, GL, GG, h, omega)
         # Send spectrum to plotter and new parameters to peak
         self.plotSpectrum.emit(omega, I)
         self.peak.setNewParams(*newParams)
 
-    def changeScale(self):
-        '''Emit the new scale to use'''
+    def changeScale(self, reverseOnly):
+        '''Emit the new scale to use after replotting with new domain'''
+        if not reverseOnly:
+            self.setDataForPlot()
         self.newXLimits.emit(self.scale.xmin,
                              self.scale.xmax,
                              self.scale.reverse

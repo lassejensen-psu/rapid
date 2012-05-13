@@ -3,16 +3,13 @@ from sys import exit
 from math import sqrt, log, pi
 from scipy.linalg import eig, inv
 from scipy.special import wofz
-from numpy import array, arange, argsort, diag, dot, eye, zeros
+from numpy import array, argsort, diag, dot, eye, zeros
 
 # A few constats
 SQRT2LOG2_2 = sqrt(2 * log(2)) * 2
 INVSQRT2LOG2_2 = 1 / SQRT2LOG2_2
 SQRT2 = sqrt(2)
 SQRT2PI = sqrt(2 * pi)
-
-# Frequency domain over interesting region
-omega = arange(200, 3000, 0.5)
 
 def ZMat(npeaks, peak_exchanges, relative_rates, symmetric):
     '''Construct the Z matrix.  Symmetry can be enforced or not.'''
@@ -42,7 +39,7 @@ def ZMat(npeaks, peak_exchanges, relative_rates, symmetric):
         
     return Z
 
-def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights):
+def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights, omega):
     '''This routine contains the code that drives the actual calculation
     of the intensities.
     '''
@@ -104,9 +101,8 @@ def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights):
     ###############################################
 
     # Return the sum of voigt profiles for each peak,
-    # along with the omega array and new parameters
+    # along with the new parameters
     return (array([voigt(omega, j, h, peaks, HWHM, sigmas) for j in N]).sum(0),
-            omega,
             new_params)
 
 def voigt(freq, j, height, vib, HWHM, sigma):

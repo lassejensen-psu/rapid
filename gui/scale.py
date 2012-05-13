@@ -2,6 +2,7 @@ from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QLabel, \
                         QLineEdit, QIntValidator, QCheckBox, \
                         QErrorMessage
+from numpy import arange
 
 class Scale(QObject):
     '''Class to hold all information about the function'''
@@ -12,6 +13,7 @@ class Scale(QObject):
         self.xmin = 1800
         self.xmax = 2100
         self.reverse = False
+        self.domain = arange(1790, 2110, 0.5)
 
     #######
     # SLOTS
@@ -19,17 +21,20 @@ class Scale(QObject):
 
     def setScale(self, min, max, reversed):
         '''Sets the rate and emits the result'''
+        reverseOnly = (self.reverse != reversed and
+                       self.xmin == min and self.xmax == max)
         self.xmin = min
         self.xmax = max
         self.reverse = reversed
-        self.scaleChanged.emit()
+        self.domain = arange(min-10, max+10, 0.5)
+        self.scaleChanged.emit(reverseOnly)
 
     #########
     # SIGNALS
     #########
 
     # The rate changed
-    scaleChanged = pyqtSignal()
+    scaleChanged = pyqtSignal(bool)
 
 #/\/\/\/\/\/\/\/
 # The scale view

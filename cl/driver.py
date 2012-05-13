@@ -1,5 +1,6 @@
 from __future__ import print_function
 from sys import stderr, stdout
+from numpy import arange
 
 def run_non_interactive(input_file):
     '''Driver to calculate the spectra non-interactively
@@ -13,9 +14,8 @@ def run_non_interactive(input_file):
         print("Find it at github.com/SethMMorton/input_reader", file=stderr)
         return 1
     from common import spectrum, SpectrumError, ZMat, \
-                       numerics, write_data, save_script
+                       numerics, write_data, save_script, read_input
     from plot import plot
-    from read_input import read_input
 
     # Read in the input file that is given
     try:
@@ -30,15 +30,19 @@ def run_non_interactive(input_file):
     # Generate the Z matrix
     Z = ZMat(len(args.vib), args.exchanges, args.exchange_rates, True)
 
+    # Generate the frequency domain
+    omega = arange(args.xlim[0]-10, args.xlim[1]+10, 0.5)
+
     # Calculate the spectrum
     try:
-        I_omega, omega, new_params = spectrum(Z,
-                                              args.k,
-                                              args.vib,
-                                              args.Gamma_Lorentz,
-                                              args.Gamma_Gauss,
-                                              args.heights
-                                             )
+        I_omega, new_params = spectrum(Z,
+                                       args.k,
+                                       args.vib,
+                                       args.Gamma_Lorentz,
+                                       args.Gamma_Gauss,
+                                       args.heights,
+                                       omega
+                                      )
     except SpectrumError as se:
         print(str(se), file=stderr)
         return 1

@@ -46,12 +46,24 @@ class Plot(QwtPlot):
         # Make sure the plot is wide enough
         self.setMinimumWidth(800)
 
+    def calculatedData(self):
+        '''Return the calculated data'''
+        x = array(self.data.data().xData())
+        y = array(self.data.data().yData())
+        return x, y
+
+    def rawData(self):
+        '''Return the calculated data'''
+        x = array(self.raw.data().xData())
+        y = array(self.raw.data().yData())
+        return x, y
+
     #######
     # SLOTS
     #######
 
-    def plotFunction(self, x, y):
-        '''Plot the given function'''
+    def plotCalculatedData(self, x, y):
+        '''Plot the calculated data'''
         y = normalize(y)
         self.data.setData(x, y)
         self.replot()

@@ -5,7 +5,7 @@ from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
                         QAction, QKeySequence, QFileDialog
 from PyQt4.Qt import qApp
-from numpy import loadtxt
+from numpy import loadtxt, savetxt, array
 from plot import Plot
 from rate import RateView
 from exchange import ExchangeView
@@ -23,6 +23,7 @@ class MainWindow(QMainWindow):
         self._initUI()
         self._makeMenu()
         self._makeConnections()
+        self.fileName = None
 
         # Default to rate in units of ps
         self.rate.rate.click()
@@ -100,7 +101,7 @@ class MainWindow(QMainWindow):
         '''Connect the widgets to each other'''
 
         # When the controller says plot, plot
-        self.control.plotSpectrum.connect(self.plot.plotFunction)
+        self.control.plotSpectrum.connect(self.plot.plotCalculatedData)
 
         # When the controller says resize x limits, do so
         self.control.newXLimits.connect(self.plot.changeScale)
@@ -158,17 +159,25 @@ class MainWindow(QMainWindow):
 
     def exportXYData(self):
         '''Export current spectrum to XY data'''
-        fileName = QFileDialog.getSaveFileName(self,
-                                               'Export calculated XY data', '',
-                                               'Data Files (*.txt *.data);;'
-                                               'All (*)')
+        filter = 'Data Files (*.txt *.data);;All (*)'
+        f = QFileDialog.getSaveFileName(self,
+                                        'Export calculated XY data',
+                                        '',
+                                        filter)
+        # Grab the XY data from the plot
+        x, y = self.plot.calculatedData()
+        # Save in a standard format
+        savetxt(str(f), array([x,y]).T, fmt='%.1f %.16f')
 
     def importXYData(self):
         '''Import data from an XY file'''
-        fileName = QFileDialog.getOpenFileName(self, 'Import raw XY data', '',
-                                               'Data Files (*.txt *.data);;'
-                                               'All (*)')
-        rawData = loadtxt(str(fileName))
+        filter = 'Data Files (*.txt *.data);;All (*)'
+        f = QFileDialog.getOpenFileName(self,
+                                        'Import raw XY data',
+                                        '',
+                                        filter)
+        # Load raw data and plot in a second curve
+        rawData = loadtxt(str(f))
         self.plot.plotRawData(rawData[:,0], rawData[:,1])
 
     #########
