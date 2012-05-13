@@ -1,8 +1,8 @@
 from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QLabel, \
-                        QLineEdit, QIntValidator, QCheckBox, \
-                        QErrorMessage
+                        QLineEdit, QIntValidator, QCheckBox
 from numpy import arange
+from error import error
 
 class Scale(QObject):
     '''Class to hold all information about the function'''
@@ -55,7 +55,6 @@ class ScaleView(QGroupBox):
         '''Initiallize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
-        self.error = QErrorMessage()
         self._createWidgets()
 
     def _createWidgets(self):
@@ -94,6 +93,12 @@ class ScaleView(QGroupBox):
         '''Attaches models to the views'''
         self.model = model
 
+    def setValue(self, xmin, xmax, reversed):
+        '''Manually sets the values that are viewed'''
+        self.xmin.setText(str(xmin))
+        self.xmax.setText(str(xmax))
+        self.reverse.setChecked(reversed)
+
     #######
     # SLOTS
     #######
@@ -105,6 +110,6 @@ class ScaleView(QGroupBox):
         reverse = self.reverse.isChecked()
         if xmin > xmax:
             err = "Lower limit cannot be greater than upper limit"
-            self.error.showMessage(err)
+            error.showMessage(err)
             return
         self.model.setScale(xmin, xmax, reverse)
