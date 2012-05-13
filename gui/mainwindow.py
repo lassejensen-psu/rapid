@@ -3,7 +3,7 @@ from sys import argv, stderr
 from os import environ
 from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
-                        QAction, QKeySequence, QFileDialog
+                        QAction, QKeySequence, QFileDialog, QPushButton
 from PyQt4.Qt import qApp
 from numpy import loadtxt, savetxt, array
 from plot import Plot
@@ -39,6 +39,8 @@ class MainWindow(QMainWindow):
         # Toggle then untoggle reverse to activate the default limits
         self.scale.reverse.click()
         self.scale.reverse.click()
+        # Clear button starts off inactive
+        self.clear.setEnabled(False)
 
     def _createtWidgets(self):
         '''Creates all the widgets'''
@@ -71,6 +73,9 @@ class MainWindow(QMainWindow):
         self.peak.makeConnections()
         self.scale.makeConnections()
 
+        # The window will own a button to clear raw data
+        self.clear = QPushButton('Clear Raw Data', self)
+
     def _initUI(self):
         '''Sets up the layout of the window'''
 
@@ -91,7 +96,10 @@ class MainWindow(QMainWindow):
         # Add the plot 
         plot_lim = QVBoxLayout()
         plot_lim.addWidget(self.plot)
-        plot_lim.addWidget(self.scale)
+        lim_clear = QHBoxLayout()
+        lim_clear.addWidget(self.scale)
+        lim_clear.addWidget(self.clear)
+        plot_lim.addLayout(lim_clear)
         self.mainLayout.addLayout(plot_lim)
 
         # Add the widgets to the central widget
@@ -105,6 +113,9 @@ class MainWindow(QMainWindow):
 
         # When the controller says resize x limits, do so
         self.control.newXLimits.connect(self.plot.changeScale)
+
+        # Clear raw data if pushed
+        self.clear.clicked.connect(self.clearRawData)
 
     def _makeMenu(self):
         '''Makes the menu bar for this widget'''
@@ -179,6 +190,12 @@ class MainWindow(QMainWindow):
         # Load raw data and plot in a second curve
         rawData = loadtxt(str(f))
         self.plot.plotRawData(rawData[:,0], rawData[:,1])
+        self.clear.setEnabled(True)
+
+    def clearRawData(self):
+        '''Clear the raw data from the plot'''
+        self.plot.clearRawData()
+        self.clear.setEnabled(False)
 
     #########
     # SIGNALS

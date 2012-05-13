@@ -86,6 +86,7 @@ class Plot(QwtPlot):
     def clearRawData(self):
         '''Clear the raw data'''
         self.raw.hide()
+        self.replot()
 
     def changeScale(self, min, max, reversed):
         '''Change the axis scale'''
