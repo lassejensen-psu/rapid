@@ -12,6 +12,7 @@ from exchange import ExchangeView
 from scale import ScaleView
 from peak import PeakView
 from controller import Controller
+from common import save_script
 
 class MainWindow(QMainWindow):
     '''The main window of the program'''
@@ -24,11 +25,9 @@ class MainWindow(QMainWindow):
         self._makeMenu()
         self._makeConnections()
         self.fileName = None
+        self.scriptName = None
+        self.expName = None
 
-        # Default to rate in units of ps
-        self.rate.rate.click()
-        self.rate.unit.setCurrentIndex(2)
-        self.rate.rate_value.setText("1.540")
         # Set initial number of peaks to 2
         self.exchange.numpeaks[0].toggle()
         # Set matrix to symmetric by default
@@ -39,6 +38,10 @@ class MainWindow(QMainWindow):
         # Toggle then untoggle reverse to activate the default limits
         self.scale.reverse.click()
         self.scale.reverse.click()
+        # Default to rate in units of THz
+        self.rate.rate.click()
+        self.rate.unit.setCurrentIndex(2)
+        self.rate.rate_value.setText("1.000")
         # Clear button starts off inactive
         self.clear.setEnabled(False)
 
@@ -194,14 +197,15 @@ class MainWindow(QMainWindow):
     def exportXYData(self):
         '''Export current spectrum to XY data'''
         filter = 'Data Files (*.txt *.data);;All (*)'
-        f = QFileDialog.getSaveFileName(self,
-                                        'Export calculated XY data',
-                                        '',
-                                        filter)
+        d = '' if self.expName is None else self.expName
+        self.expName = QFileDialog.getSaveFileName(self,
+                                                  'Export calculated XY data',
+                                                  d,
+                                                  filter)
         # Grab the XY data from the plot
         x, y = self.plot.calculatedData()
         # Save in a standard format
-        savetxt(str(f), array([x,y]).T, fmt='%.1f %.16f')
+        savetxt(str(self.expName), array([x,y]).T, fmt='%.1f %.16f')
 
     def importXYData(self):
         '''Import data from an XY file'''
@@ -217,7 +221,20 @@ class MainWindow(QMainWindow):
 
     def makeScript(self):
         '''Open parameters from an input file'''
-        pass
+        filter = 'Python Scripts (*.py)'
+        d = '' if self.scriptName is None else self.scriptName
+        self.scriptName = QFileDialog.getSaveFileName(self,
+                                                     'Make script',
+                                                     d,
+                                                     filter)
+        # Get parameters needed
+        xlim, rev, oldp, newp = self.control.getParametersForScript()
+        x, y = self.plot.calculatedData()
+        if self.clear.isEnabled():
+            raw = self.plot.rawData()
+        else:
+            raw = None
+        save_script(x, y, raw, xlim, rev, oldp, newp, self.scriptName)
 
     #########
     # SIGNALS
