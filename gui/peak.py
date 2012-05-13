@@ -1,6 +1,7 @@
 from PyQt4.QtCore import pyqtSignal, QObject
 from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
                         QDoubleValidator, QLabel, QGridLayout
+from numpy import asarray
 
 class PeakView(QTabWidget):
     '''Class to display the peak information'''
@@ -199,6 +200,13 @@ class PeakModel(QObject):
         self.newGL    = [0.0, 0.0, 0.0, 0.0]
         self.newGG    = [0.0, 0.0, 0.0, 0.0]
         self.newh     = [0.0, 0.0, 0.0, 0.0]
+
+    def getParams(self):
+        '''Return the input parameters for the given number of peaks'''
+        return (asarray(self.peaks[:self.npeaks]),
+                asarray(self.GL[:self.npeaks]),
+                asarray(self.GG[:self.npeaks]),
+                asarray(self.h[:self.npeaks]))
 
     #######
     # SLOTS
