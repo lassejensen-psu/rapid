@@ -28,7 +28,8 @@ def run_non_interactive(input_file):
         return 1
 
     # Generate the Z matrix
-    Z = ZMat(len(args.vib), args.exchanges, args.exchange_rates, True)
+    Z = ZMat(len(args.vib), args.exchanges, args.exchange_rates,
+             self.symmetric_exchange)
 
     # Generate the frequency domain
     omega = arange(args.xlim[0]-10, args.xlim[1]+10, 0.5)

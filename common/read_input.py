@@ -54,7 +54,8 @@ def read_input(input_file):
                                     glob={'type' : float,
                                           'default' : 1.0,
                                           'len' : '?'})
-    reader.add_boolean_key('symmetric_exchange', action=True, default=False)
+    reader.add_boolean_key('nosym', action=False, default=True,
+                           dest='symmetric_exchange')
 
     # Actually read the input file
     args, ifile = reader.read_input(input_file)
@@ -127,7 +128,7 @@ def read_input(input_file):
             p2 = exchange[1]
             if p2 not in num:
                 raise ReaderError(string.format(p2))
-            if p1 == p2 and not args.symmetric_exchange:
+            if p1 == p2 and args.symmetric_exchange:
                 raise ReaderError('Self exchange is not allowed')
             rate = exchange[2]
             # Offset the peak number by one to match python indicies
