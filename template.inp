@@ -6,7 +6,7 @@
 # You may give it in either 'lifetime' or 'rate', but not both.
 # The default unit is ps, but you can change it to fs, ps, ns, or s.
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-rate 1.54 ps
+rate 1.54 THz
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 # The peak lines contain the peaks you want to plot.
