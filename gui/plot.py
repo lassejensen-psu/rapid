@@ -53,10 +53,10 @@ class Plot(QwtPlot):
         return x, y
 
     def rawData(self):
-        '''Return the calculated data'''
+        '''Return the raw data in same format it was read in'''
         x = array(self.raw.data().xData())
         y = array(self.raw.data().yData())
-        return x, y
+        return array([x, y]).T
 
     #######
     # SLOTS
