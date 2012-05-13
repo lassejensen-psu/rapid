@@ -28,7 +28,7 @@ def read_input(input_file):
                             'default' : 'thz'})
 
     # The range of the X-axis
-    reader.add_line_key('xlim', type=[float, float], default=(1900.0, 2000.0))
+    reader.add_line_key('xlim', type=[int, int], default=(1900, 2000))
     reader.add_boolean_key('reverse', action=True, default=False)
 
     # Plot data to screen,output to txt file, or to a script.
@@ -62,6 +62,7 @@ def read_input(input_file):
 
     # Make sure the filename was given correctly and read in data
     if args.raw:
+        args.add('rawName', args.raw)
         args.raw = loadtxt(abs_file_path(args.raw))
 
     # Make the output file path absolute if given

@@ -1,23 +1,12 @@
 from __future__ import print_function, division
 from sys import stderr
-from numpy import where
+from numpy import where, savetxt, array
 
 def write_data(x, y, datafile):
     '''Writes the normalized data to file.'''
 
     # Write the data to file. 
-    try:
-        f = open(datafile, 'w')
-    except (IOError, OSError) as e:
-        print(str(e), file=stderr) # Error writing file to disk
-        return 1
-
-    # Write the arrays line by line in reverse order
-    for xd, yd in reversed(zip(x, y)):
-        print('{0:17.10E} {1:17.10E}'.format(xd, yd), file=f)
-    f.close()
-    print('Data written to file {0}'.format(datafile))
-    return 0
+    savetxt(str(datafile), array([x, y]).T, fmt='%.1f %.16f')
 
 def numerics(old_params, new_params, out):
     '''Make a nice table of the old and new data'''
