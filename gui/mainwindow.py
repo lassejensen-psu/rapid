@@ -6,13 +6,15 @@ from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
                         QAction, QKeySequence, QFileDialog, QPushButton
 from PyQt4.Qt import qApp
 from numpy import loadtxt, savetxt, array
+from input_reader import ReaderError
 from plot import Plot
 from rate import RateView
 from exchange import ExchangeView
 from scale import ScaleView
 from peak import PeakView
 from controller import Controller
-from common import save_script
+from common import save_script, read_input
+from error import error
 
 class MainWindow(QMainWindow):
     '''The main window of the program'''
@@ -28,20 +30,14 @@ class MainWindow(QMainWindow):
         self.scriptName = None
         self.expName = None
 
-        # Set initial number of peaks to 2
-        self.exchange.numpeaks[0].toggle()
+        # Set initial number of peaks
+        self.exchange.setNumPeaks(2)
         # Set matrix to symmetric by default
-        self.exchange.symmetry.setChecked(True)
+        self.exchange.setMatrixSymmetry(True)
         # Set the initial window.  
-        self.scale.xmin.setText("1900")
-        self.scale.xmax.setText("2100")
-        # Toggle then untoggle reverse to activate the default limits
-        self.scale.reverse.click()
-        self.scale.reverse.click()
+        self.scale.setValue(1900, 2100, False)
         # Default to rate in units of THz
-        self.rate.rate.click()
-        self.rate.unit.setCurrentIndex(2)
-        self.rate.rate_value.setText("1.000")
+        self.rate.setUnit('THz')
         # Clear button starts off inactive
         self.clear.setEnabled(False)
 
@@ -184,7 +180,18 @@ class MainWindow(QMainWindow):
 
     def openFromInput(self):
         '''Open parameters from an input file'''
-        pass
+        filter = 'Input Files (*.inp);;All (*)'
+        self.fileName = QFileDialog.getOpenFileName(self,
+                                                   'Open Input File',
+                                                   '',
+                                                   filter)
+        # Read given input file
+        try:
+            args.read_input(self.fileName)
+        except ReaderError as r: # Error reading the input file
+            error.showMessage(str(r))
+            return
+
 
     def saveToInput(self):
         '''Save current settings to current input file if available'''
