@@ -1,11 +1,12 @@
 from __future__ import division
 from sys import argv, stderr
 from os import environ
+from textwrap import dedent
 from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
                         QAction, QKeySequence, QFileDialog, QPushButton
 from PyQt4.Qt import qApp
-from numpy import loadtxt, savetxt, array
+from numpy import loadtxt, array
 from input_reader import ReaderError
 from plot import Plot
 from rate import RateView
@@ -13,7 +14,7 @@ from exchange import ExchangeView
 from scale import ScaleView
 from peak import PeakView
 from controller import Controller
-from common import save_script, read_input
+from common import save_script, read_input, ZMat, write_data
 from error import error
 
 class MainWindow(QMainWindow):
@@ -29,6 +30,7 @@ class MainWindow(QMainWindow):
         self.fileName = None
         self.scriptName = None
         self.expName = None
+        self.rawName = None
 
         # Set initial number of peaks
         self.exchange.setNumPeaks(2)
@@ -136,7 +138,7 @@ class MainWindow(QMainWindow):
 
         # Save action
         saveas = QAction('Save As', self)
-        save.triggered.connect(self.saveToInputAs)
+        saveas.triggered.connect(self.saveToInputAs)
         self.fileMenu.addAction(saveas)
 
         # Menu seperator
@@ -181,46 +183,127 @@ class MainWindow(QMainWindow):
     def openFromInput(self):
         '''Open parameters from an input file'''
         filter = 'Input Files (*.inp);;All (*)'
-        self.fileName = QFileDialog.getOpenFileName(self,
-                                                   'Open Input File',
-                                                   '',
-                                                   filter)
+        s = QFileDialog.getOpenFileName(self, 'Open Input File',
+                                              '', filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        fileName = s
+
         # Read given input file
         try:
-            args.read_input(self.fileName)
+            args = read_input(fileName)
         except ReaderError as r: # Error reading the input file
             error.showMessage(str(r))
-            return
 
+        # Set the number of peaks
+        npeaks = len(args.num)
+        if npeaks < 2:
+            error.showMessage('Need at least 2 peaks for exchange')
+            return
+        elif npeaks > 4:
+            error.showMessage('This GUI can only handle up to 4 peaks. '
+                              'Use the command-line version for an arbitrary '
+                              'number of peaks')
+            return
+        self.exchange.setNumPeaks(npeaks)
+
+        # Set the exchange
+        matrix = ZMat(npeaks, args.exchanges, args.exchange_rates,
+                      args.symmetric_exchange)
+        self.exchange.setMatrixSymmetry(args.symmetric_exchange)
+        self.exchange.setMatrix(matrix)
+
+        # Set the rate
+        if 'lifetime' in args:
+            self.rate.setUnit(args.lifetime[1])
+            self.rate.setRate(args.lifetime[0])
+        else:
+            self.rate.setUnit(args.rate[1])
+            self.rate.setRate(args.rate[0])
+
+        # Set the peak data
+        self.peak.setPeaks(args.vib, args.Gamma_Lorentz, args.Gamma_Gauss,
+                           args.heights)
+
+        # Plot this data
+        self.control.setDataForPlot()
+
+        # Plot raw data if it exists
+        if args.raw is not None:
+            self.rawName = args.rawName
+            self.plot.plotRawData(args.raw[:,0], args.raw[:,1])
+            self.clear.setEnabled(True)
+
+        # Set the limits
+        self.scale.setValue(args.xlim[0], args.xlim[1], args.reverse)
+
+        # Default the script file name or data file nameif given
+        if args.data:
+            self.expName = args.data
+        elif args.save_plot_script:
+            self.scriptName = args.args.save_plot_script
 
     def saveToInput(self):
         '''Save current settings to current input file if available'''
-        pass
+        if not self.control.hasPlot:
+            error.showMessage('Cannot save.. there is no data to save yet')
+            return
+        if self.fileName is None:
+            self.saveToInputAs()
+        else:
+            self.inputGen(self.fileName)
 
     def saveToInputAs(self):
         '''Save current settings to an input file of specified name'''
-        pass
+        if not self.control.hasPlot:
+            error.showMessage('Cannot save.. there is no data to save yet')
+            return
+        filter = 'Input Files (*.inp);;All (*)'
+        d = '' if self.fileName is None else self.fileName
+        s = QFileDialog.getSaveFileName(self, 'Save Input File',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.fileName = s
+
+        # Generate the input file
+        self.inputGen(self.fileName)
 
     def exportXYData(self):
         '''Export current spectrum to XY data'''
+        if not self.control.hasPlot:
+            error.showMessage('Cannot export.. there is no data to export yet')
+            return
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.expName is None else self.expName
-        self.expName = QFileDialog.getSaveFileName(self,
-                                                  'Export calculated XY data',
-                                                  d,
-                                                  filter)
+        s = QFileDialog.getSaveFileName(self, 'Export calculated XY data',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.expName = s
+
         # Grab the XY data from the plot
         x, y = self.plot.calculatedData()
         # Save in a standard format
-        savetxt(str(self.expName), array([x,y]).T, fmt='%.1f %.16f')
+        try:
+            write_data(x, y, self.expName)
+        except (IOError, OSError) as e:
+            error.showMessage(str(e))
 
     def importXYData(self):
         '''Import data from an XY file'''
         filter = 'Data Files (*.txt *.data);;All (*)'
-        f = QFileDialog.getOpenFileName(self,
-                                        'Import raw XY data',
-                                        '',
-                                        filter)
+        d = '' if self.rawName is None else self.rawName
+        s = QFileDialog.getOpenFileName(self, 'Import raw XY data',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.rawName = s
+
         # Load raw data and plot in a second curve
         rawData = loadtxt(str(f))
         self.plot.plotRawData(rawData[:,0], rawData[:,1])
@@ -228,12 +311,18 @@ class MainWindow(QMainWindow):
 
     def makeScript(self):
         '''Open parameters from an input file'''
+        if not self.control.hasPlot:
+            error.showMessage('Cannot save.. there is no data to save yet')
+            return
         filter = 'Python Scripts (*.py)'
         d = '' if self.scriptName is None else self.scriptName
-        self.scriptName = QFileDialog.getSaveFileName(self,
-                                                     'Make script',
-                                                     d,
-                                                     filter)
+        s = QFileDialog.getSaveFileName(self, 'Make script',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.scriptName = s
+
         # Get parameters needed
         xlim, rev, oldp, newp = self.control.getParametersForScript()
         x, y = self.plot.calculatedData()
@@ -242,6 +331,77 @@ class MainWindow(QMainWindow):
         else:
             raw = None
         save_script(x, y, raw, xlim, rev, oldp, newp, self.scriptName)
+
+    def inputGen(self, fileName):
+        '''Generate an input file'''
+
+        # Open file for writing        
+        try:
+            fl = open(fileName, 'w')
+        except (IOError, OSError) as e:
+            error.showError(str(e))
+
+        # Generate a template string to print
+        s = dedent('''\
+            # The rate or lifetime of the reaction
+            {rate}
+
+            # The exchange matrix
+            {exchange}
+
+            # The peak data
+            {peaks}
+
+            # The plot limits
+            {limits}
+
+            # Raw input file, if any
+            {raw}
+            ''')
+
+        # Get the parameters from the underlying data
+        xlim, rev, rate, exchange, peaks = self.control.getParametersForInput()
+
+        # Create the rate string
+        if rate[1] in ('s', 'ns', 'ps', 'fs'):
+            lr = 'lifetime'
+        else:
+            lr = 'rate'
+        ratestr = '{0} {1[0]:.3G} {1[1]}'.format(lr, rate)
+
+        # Create exchange string
+        exstr = []
+        if not exchange[2]:
+            exstr.append('nosym')
+        f = 'exchange {0:d} {1:d} {2:.3f}'
+        for indx, r in zip(exchange[1], exchange[0]):
+            exstr.append(f.format(indx[0]+1, indx[1]+1, r))
+        exstr = '\n'.join(exstr)
+
+        # Create peak string
+        peakstr = []
+        f = 'peak {0:.2f} {1:.3f} L={2:.3f} G={3:.3f}'
+        for p, l, g, h in zip(peaks[0], peaks[1], peaks[2], peaks[3]):
+            peakstr.append(f.format(p, h, l, g))
+        peakstr = '\n'.join(peakstr)
+            
+        # Create the limits string
+        limitstr = 'xlim {0[0]:d} {0[1]:d}'.format(xlim)
+        if rev:
+            limitstr += '\nreverse'
+
+        # Create the IO string
+        if self.rawName is not None:
+            rawstr = 'raw {0}'.format(self.rawName)
+        else:
+            rawstr = ''
+
+        # Write the string to file
+        fl.write(s.format(rate=ratestr, peaks=peakstr, limits=limitstr,
+                          exchange=exstr, raw=rawstr))
+
+        # Close file
+        fl.close()
 
     #########
     # SIGNALS

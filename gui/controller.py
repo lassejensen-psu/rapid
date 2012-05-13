@@ -1,5 +1,5 @@
 from PyQt4.QtCore import pyqtSignal, QObject
-from numpy import ndarray
+from numpy import ndarray, isnan, sum
 from peak import PeakModel
 from exchange import ExchangeModel, NumPeaks
 from rate import Rate
@@ -24,6 +24,7 @@ class Controller(QObject):
         self.rateParams = None
         self.exchangeParams = None
         self.limits = None
+        self.hasPlot = False
 
     def _makeConnections(self):
         '''Connect the contained widgets'''
@@ -49,7 +50,11 @@ class Controller(QObject):
 
     def getParametersForInput(self):
         '''Return the parameters in a format to make an input file'''
-        pass
+        rate = self.rate.getParams()
+        exchange = self.exchange.getParams(self.numpeaks.getNumPeaks())
+        xlim = self.limits[0], self.limits[1]
+        reverse = self.limits[2]
+        return xlim, reverse, rate, exchange, self.oldParams
 
     #######
     # SLOTS
@@ -72,18 +77,20 @@ class Controller(QObject):
         # Don's plot if there is some error
         if k == 0 or k is None:
             return
-        elif npeaks != len(vib):
+        elif npeaks != len(vib) or isnan(sum(vib)):
             return
-        elif npeaks != len(GL):
+        elif npeaks != len(GL) or isnan(sum(GL)):
             return
-        elif npeaks != len(GG):
+        elif npeaks != len(GG) or isnan(sum(GG)):
             return
-        elif npeaks != len(h):
+        elif npeaks != len(h) or isnan(sum(h)):
             return
         elif npeaks != len(Z):
             return
         elif len(omega) == 0:
             return
+        else:
+            self.hasPlot = True
         # Calculate spectrum
         I, self.newParams = spectrum(Z, k, vib, GL, GG, h, omega)
         # Send spectrum to plotter and new parameters to peak
@@ -95,9 +102,9 @@ class Controller(QObject):
         self.exchangeParams = self.exchange.getParams(npeaks)
         self.limits = self.scale.getScale()
 
-    def changeScale(self, reverseOnly):
+    def changeScale(self, recalculate):
         '''Emit the new scale to use after replotting with new domain'''
-        if not reverseOnly:
+        if recalculate:
             self.setDataForPlot()
         min, max, rev = self.scale.getScale()
         self.newXLimits.emit(min, max, rev)

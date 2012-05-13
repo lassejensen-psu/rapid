@@ -84,11 +84,11 @@ class ExchangeView(QGroupBox):
     def setNumPeaks(self, npeaks):
         '''Manually set the number of peaks'''
         if npeaks == 2:
-            self.numpeaks[0].toggle()
+            self.numpeaks[0].click()
         elif npeaks == 3:
-            self.numpeaks[1].toggle()
+            self.numpeaks[1].click()
         elif npeaks == 4:
-            self.numpeaks[2].toggle()
+            self.numpeaks[2].click()
         else:
             error.showMessage('Only valid number of peaks is 2, 3, or 4')
 
@@ -100,7 +100,8 @@ class ExchangeView(QGroupBox):
         '''Manually set the matrix elements with a numpy matrix'''
         npeaks = self.npmodel.getNumPeaks()
         self.matrix.matrix = Z[0:npeaks,0:npeaks]
-        self.matrix.setMatrix(npeaks)
+        self.matrix.updateInternalModel(npeaks)
+        self.resetMatrix()
 
     #######
     # SLOTS
@@ -272,8 +273,12 @@ class ExchangeModel(QObject):
         indx = self.symindx[npeaks] if self.sym else self.unsymindx[npeaks]
         rate = self.symrate[npeaks] if self.sym else self.unsymrate[npeaks]
 
-        # Send values to the ZMat constructor
+        # Send values to the ZMat constructor then update
         self.matrix = ZMat(npeaks, indx, rate, self.sym)
+        self.updateInternalModel(npeaks)
+
+    def updateInternalModel(self, npeaks):
+        '''Updates the internal representation from the matrix'''
 
         # Use the new values to update the internal matrix model
         if npeaks == 2:

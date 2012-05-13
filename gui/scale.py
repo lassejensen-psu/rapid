@@ -29,13 +29,12 @@ class Scale(QObject):
 
     def setScale(self, min, max, reversed):
         '''Sets the rate and emits the result'''
-        reverseOnly = (self.reverse != reversed and
-                       self.xmin == min and self.xmax == max)
+        replot = (self.xmin != min or self.xmax != max)
         self.xmin = min
         self.xmax = max
         self.reverse = reversed
         self.domain = arange(min-10, max+10, 0.5)
-        self.scaleChanged.emit(reverseOnly)
+        self.scaleChanged.emit(replot)
 
     #########
     # SIGNALS
@@ -98,6 +97,7 @@ class ScaleView(QGroupBox):
         self.xmin.setText(str(xmin))
         self.xmax.setText(str(xmax))
         self.reverse.setChecked(reversed)
+        self.reverse.clicked.emit(reversed)
 
     #######
     # SLOTS

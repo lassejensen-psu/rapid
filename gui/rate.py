@@ -2,6 +2,7 @@ from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
                         QComboBox, QRadioButton, QStringListModel, \
                         QLineEdit, QDoubleValidator, QGridLayout
+from error import error
 from numpy.testing import assert_approx_equal
 from math import pi
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
@@ -138,7 +139,7 @@ class RateView(QGroupBox):
     def setRate(self, rate):
         '''Set the rate manually'''
         self.rate_value.setText(str(rate))
-        self.rate_value.returnPressed()
+        self.rate_value.editingFinished.emit()
 
     def setUnit(self, unit):
         '''Set the unit manually'''
@@ -154,18 +155,20 @@ class RateView(QGroupBox):
         elif unit == 'fs':
             self.lifetime.click()
             self.unit.setCurrentIndex(3)
-        if unit == 'Hz':
+        elif unit in ('Hz', 'hz'):
             self.rate.click()
             self.unit.setCurrentIndex(0)
-        elif unit == 'GHz':
+        elif unit in ('GHz', 'ghz'):
             self.rate.click()
             self.unit.setCurrentIndex(1)
-        elif unit == 'THz':
+        elif unit in ('THz', 'thz'):
             self.rate.click()
             self.unit.setCurrentIndex(2)
-        elif unit == 'PHz':
+        elif unit in ('PHz', 'phz'):
             self.rate.click()
             self.unit.setCurrentIndex(3)
+        else:
+            error.showMessage('Invalid unit: {0}'.format(unit))
 
     #######
     # SLOTS

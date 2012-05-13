@@ -1,7 +1,7 @@
 from PyQt4.QtCore import pyqtSignal, QObject
 from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
                         QDoubleValidator, QLabel, QGridLayout
-from numpy import asarray
+from numpy import asarray, nan
 
 class PeakView(QTabWidget):
     '''Class to display the peak information'''
@@ -55,6 +55,11 @@ class PeakView(QTabWidget):
     def setModel(self, model):
         '''Attaches a model to this view'''
         self.model = model
+
+    def setPeaks(self, vib, GL, GG, h):
+        '''Manually set the peak data'''
+        for i, vals in enumerate(zip(vib, GL, GG, h)):
+            self.pages[i].setParams(*vals)
 
     #######
     # SLOTS
@@ -166,6 +171,15 @@ class PeakPage(QWidget):
         self.newGG.setText('{0:.3f}'.format(GG))
         self.newH.setText('{0:.3f}'.format(h))
 
+    def setParams(self, p, GL, GG, h):
+        '''Manually set the parameters on this page'''
+        self.inputpeak.setText('{0:.1f}'.format(p))
+        self.inputGL.setText('{0:.3f}'.format(GL))
+        self.inputGG.setText('{0:.3f}'.format(GG))
+        self.inputH.setText('{0:.3f}'.format(h))
+        # Force an updata of the data
+        self.inputpeak.editingFinished.emit()
+
     #######
     # SLOTS
     #######
@@ -197,12 +211,12 @@ class PeakModel(QObject):
         super(QObject, self).__init__(parent)
         self.npeaks = 0
         #self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]
-        self.peaks    = [None, None, None, None]
-        self.GL       = [None, None, None, None]
+        self.peaks    = [nan, nan, nan, nan]
+        self.GL       = [nan, nan, nan, nan]
         #self.GL       = [5.0, 5.0, 5.0, 5.0]
-        self.GG       = [None, None, None, None]
+        self.GG       = [nan, nan, nan, nan]
         #self.GG       = [5.0, 5.0, 5.0, 5.0]
-        self.h        = [None, None, None, None]
+        self.h        = [nan, nan, nan, nan]
         #self.h        = [1.0, 1.0, 1.0, 1.0]
         self.newpeaks = [0.0, 0.0, 0.0, 0.0]
         self.newGL    = [0.0, 0.0, 0.0, 0.0]
