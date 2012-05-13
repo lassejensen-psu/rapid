@@ -156,6 +156,10 @@ class NumPeaks(QObject):
         super(QObject, self).__init__(parent)
         self.numPeaks = 2
 
+    def getNumPeaks(self):
+        '''Return the number of peak'''
+        return self.numPeaks
+
     #######
     # SLOTS
     #######
@@ -339,19 +343,24 @@ class ExchangeModel(QObject):
 
         self.matrixChanged.emit()
 
+    def getParams(self, npeaks):
+        '''Return the exchange parameters'''
+        if self.sym:
+            return self.symrate[npeaks], self.symindx[npeaks], True
+        else:
+            return self.unsymrate[npeaks], self.unsymindx[npeaks], False
+
+    def getMatrix(self):
+        '''Return the actual exchange matrix'''
+        return self.matrix
+
     #######
     # SLOTS
     #######
 
     def resizeMatrix(self, npeaks):
         '''Resize the matrix to the number of peaks'''
-        if npeaks > len(self.matrix):
-            N = len(self.matrix)
-            oldmatrix = self.matrix.copy()
-            self.matrix = zeros((npeaks,npeaks))
-            self.matrix[0:N,0:N] = oldmatrix.copy()
-        else:
-            self.matrix = self.matrix[0:npeaks,0:npeaks].copy()
+        self.matrix = zeros((npeaks,npeaks))
         self.setMatrix(npeaks)
 
     def updateExchange(self, value, indx, npeaks):
