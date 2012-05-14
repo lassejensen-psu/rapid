@@ -15,7 +15,8 @@ from scale import ScaleView
 from peak import PeakView
 from controller import Controller
 from common import save_script, read_input, ZMat, write_data
-from error import error
+from guicommon import error
+from guicommon import toolTipText as ttt
 
 class MainWindow(QMainWindow):
     '''The main window of the program'''
@@ -76,8 +77,8 @@ class MainWindow(QMainWindow):
 
         # The window will own a button to clear raw data
         self.clear = QPushButton('Clear Raw Data', self)
-        self.clear.setToolTip('Remove raw data from the plot '
-                              'if there is any')
+        self.clear.setToolTip(ttt('Remove raw data from the plot '
+                                  'if there is any'))
 
     def _initUI(self):
         '''Sets up the layout of the window'''

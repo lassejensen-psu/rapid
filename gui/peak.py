@@ -2,6 +2,7 @@ from PyQt4.QtCore import pyqtSignal, QObject
 from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
                         QDoubleValidator, QLabel, QGridLayout
 from numpy import asarray, nan
+from guicommon import toolTipText as ttt
 
 class PeakView(QTabWidget):
     '''Class to display the peak information'''
@@ -117,17 +118,18 @@ class PeakPage(QWidget):
         self.newGG.setReadOnly(True)
         self.newH.setReadOnly(True)
 
-        self.inputpeak.setToolTip('The vibrational frequency of this peak, '
-                                  'in wavenumbers')
-        self.inputGL.setToolTip('The Lorentzian FWHM broadening of this peak, '
-                                'in wavenumbers')
-        self.inputGG.setToolTip('The Gaussian FWHM broadening of this peak, '
-                                'in wavenumbers')
-        self.inputH.setToolTip('The relative height of this peak')
-        self.newpeak.setToolTip('The vibrational frequency after exchange')
-        self.newGL.setToolTip('The Gaussian FWHM after exchange')
-        self.newGG.setToolTip('The Lorentzian FWHM after exchange')
-        self.newH.setToolTip('The relative height after exchange')
+        self.inputpeak.setToolTip(ttt('The vibrational frequency of this peak'
+                                      ', in wavenumbers'))
+        self.inputGL.setToolTip(ttt('The Lorentzian FWHM broadening of this '
+                                    'peak, in wavenumbers'))
+        self.inputGG.setToolTip(ttt('The Gaussian FWHM broadening of this peak'
+                                    ', in wavenumbers'))
+        self.inputH.setToolTip(ttt('The relative height of this peak'))
+        self.newpeak.setToolTip(ttt('The vibrational frequency after '
+                                    'exchange'))
+        self.newGL.setToolTip(ttt('The Gaussian FWHM after exchange'))
+        self.newGG.setToolTip(ttt('The Lorentzian FWHM after exchange'))
+        self.newH.setToolTip(ttt('The relative height after exchange'))
 
     def _initUI(self):
         '''Layout the contained widgets'''

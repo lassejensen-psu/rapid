@@ -2,7 +2,8 @@ from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QLabel, \
                         QLineEdit, QIntValidator, QCheckBox
 from numpy import arange
-from error import error
+from guicommon import error
+from guicommon import toolTipText as ttt
 
 class Scale(QObject):
     '''Class to hold all information about the function'''
@@ -61,12 +62,14 @@ class ScaleView(QGroupBox):
 
         # The three choosers
         self.xmin = QLineEdit(self)
-        self.xmin.setToolTip('The lower limit of the plot, in wavenumbers')
+        self.xmin.setToolTip(ttt('The lower limit of the plot, in '
+                                 'wavenumbers'))
         self.xmax = QLineEdit(self)
-        self.xmax.setToolTip('The upper limit of the plot, in wavenumbers')
+        self.xmax.setToolTip(ttt('The upper limit of the plot, in '
+                                 'wavenumbers'))
         self.reverse = QCheckBox("Reverse Limits", self)
-        self.reverse.setToolTip('Display plot with higher frequencies on '
-                                'the left, not the right')
+        self.reverse.setToolTip(ttt('Display plot with higher frequencies on '
+                                    'the left, not the right'))
 
         # Set validators for limits
         self.xmin.setValidator(QIntValidator(300, 3000, self.xmin))

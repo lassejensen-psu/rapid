@@ -2,7 +2,8 @@ from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
                         QComboBox, QRadioButton, QStringListModel, \
                         QLineEdit, QDoubleValidator, QGridLayout
-from error import error
+from guicommon import error
+from guicommon import toolTipText as ttt
 from numpy.testing import assert_approx_equal
 from math import pi
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
@@ -87,9 +88,10 @@ class RateView(QGroupBox):
 
         # Rate or lifetime chooser
         self.rate = QRadioButton('Rate', self)
-        self.rate.setToolTip('Choose this to express exchange as rate')
+        self.rate.setToolTip(ttt('Choose this to express exchange as rate'))
         self.lifetime = QRadioButton('Lifetime', self)
-        self.lifetime.setToolTip('Choose this to express exchange as lifetime')
+        self.lifetime.setToolTip(ttt('Choose this to express exchange as '
+                                     'lifetime'))
 
         # Box containing value
         self.rate_value = QLineEdit(self)
@@ -97,12 +99,12 @@ class RateView(QGroupBox):
         validate.setDecimals(3)
         validate.setBottom(0.0)
         self.rate_value.setValidator(validate)
-        self.rate_value.setToolTip('The rate or lifetime value')
+        self.rate_value.setToolTip(ttt('The rate or lifetime value'))
 
         # Unit
         self.unit = QComboBox(self)
-        self.unit.setToolTip('Selects the input unit for the rate '
-                             'or lifetime')
+        self.unit.setToolTip(ttt('Selects the input unit for the rate '
+                                 'or lifetime'))
 
     def initUI(self):
         '''Lays out the widgets'''
