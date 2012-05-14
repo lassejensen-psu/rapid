@@ -87,7 +87,9 @@ class RateView(QGroupBox):
 
         # Rate or lifetime chooser
         self.rate = QRadioButton('Rate', self)
+        self.rate.setToolTip('Choose this to express exchange as rate')
         self.lifetime = QRadioButton('Lifetime', self)
+        self.lifetime.setToolTip('Choose this to express exchange as lifetime')
 
         # Box containing value
         self.rate_value = QLineEdit(self)
@@ -95,9 +97,12 @@ class RateView(QGroupBox):
         validate.setDecimals(3)
         validate.setBottom(0.0)
         self.rate_value.setValidator(validate)
+        self.rate_value.setToolTip('The rate or lifetime value')
 
         # Unit
         self.unit = QComboBox(self)
+        self.unit.setToolTip('Selects the input unit for the rate '
+                             'or lifetime')
 
     def initUI(self):
         '''Lays out the widgets'''

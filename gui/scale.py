@@ -61,8 +61,12 @@ class ScaleView(QGroupBox):
 
         # The three choosers
         self.xmin = QLineEdit(self)
+        self.xmin.setToolTip('The lower limit of the plot, in wavenumbers')
         self.xmax = QLineEdit(self)
+        self.xmax.setToolTip('The upper limit of the plot, in wavenumbers')
         self.reverse = QCheckBox("Reverse Limits", self)
+        self.reverse.setToolTip('Display plot with higher frequencies on '
+                                'the left, not the right')
 
         # Set validators for limits
         self.xmin.setValidator(QIntValidator(300, 3000, self.xmin))

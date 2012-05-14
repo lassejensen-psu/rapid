@@ -25,23 +25,6 @@ class PeakView(QTabWidget):
         self.addTab(self.pages[0], self.pages[0].title)
         self.addTab(self.pages[1], self.pages[1].title)
         self.npeaks = 2
-        # Fill the pages with some default values
-        #self.pages[0].inputpeak.setText('{0:.1f}'.format(self.model.peaks[0]))
-        #self.pages[0].inputGL.setText('{0:.3f}'.format(self.model.GL[0]))
-        #self.pages[0].inputGG.setText('{0:.3f}'.format(self.model.GG[0]))
-        #self.pages[0].inputH.setText('{0:.3f}'.format(self.model.h[0]))
-        #self.pages[1].inputpeak.setText('{0:.1f}'.format(self.model.peaks[1]))
-        #self.pages[1].inputGL.setText('{0:.3f}'.format(self.model.GL[1]))
-        #self.pages[1].inputGG.setText('{0:.3f}'.format(self.model.GG[1]))
-        #self.pages[1].inputH.setText('{0:.3f}'.format(self.model.h[1]))
-        #self.pages[2].inputpeak.setText('{0:.1f}'.format(self.model.peaks[2]))
-        #self.pages[2].inputGL.setText('{0:.3f}'.format(self.model.GL[2]))
-        #self.pages[2].inputGG.setText('{0:.3f}'.format(self.model.GG[2]))
-        #self.pages[2].inputH.setText('{0:.3f}'.format(self.model.h[2]))
-        #self.pages[3].inputpeak.setText('{0:.1f}'.format(self.model.peaks[3]))
-        #self.pages[3].inputGL.setText('{0:.3f}'.format(self.model.GL[3]))
-        #self.pages[3].inputGG.setText('{0:.3f}'.format(self.model.GG[3]))
-        #self.pages[3].inputH.setText('{0:.3f}'.format(self.model.h[3]))
 
     def makeConnections(self):
         '''Connect all the contained widgets togeter'''
@@ -133,6 +116,18 @@ class PeakPage(QWidget):
         self.newGL.setReadOnly(True)
         self.newGG.setReadOnly(True)
         self.newH.setReadOnly(True)
+
+        self.inputpeak.setToolTip('The vibrational frequency of this peak, '
+                                  'in wavenumbers')
+        self.inputGL.setToolTip('The Lorentzian FWHM broadening of this peak, '
+                                'in wavenumbers')
+        self.inputGG.setToolTip('The Gaussian FWHM broadening of this peak, '
+                                'in wavenumbers')
+        self.inputH.setToolTip('The relative height of this peak')
+        self.newpeak.setToolTip('The vibrational frequency after exchange')
+        self.newGL.setToolTip('The Gaussian FWHM after exchange')
+        self.newGG.setToolTip('The Lorentzian FWHM after exchange')
+        self.newH.setToolTip('The relative height after exchange')
 
     def _initUI(self):
         '''Layout the contained widgets'''

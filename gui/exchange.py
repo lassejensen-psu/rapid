@@ -1,11 +1,12 @@
 from __future__ import division
 from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant, QRegExp
+from math import pi
+from textwrap import dedent
 from PyQt4.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
                         QLineEdit, QComboBox, QStringListModel, QCheckBox, \
                         QGridLayout, QDoubleValidator, QRadioButton
 from numpy.testing import assert_approx_equal
 from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
-from math import pi
 from common import ZMat
 from error import error
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
@@ -27,14 +28,30 @@ class ExchangeView(QGroupBox):
         self.numpeaks = [QRadioButton("2"),
                          QRadioButton("3"),
                          QRadioButton("4")]
+        self.numpeaks[0].setToolTip('Model the exchange of 2 peaks')
+        self.numpeaks[1].setToolTip('Model the exchange of 3 peaks')
+        self.numpeaks[2].setToolTip('Model the exchange of 4 peaks')
         # Make 4x4 matrix of QLabels
         self.exview = [[QLabel(self) for i in xrange(4)] for j in xrange(4)]
+        for i in xrange(4):
+            for e in self.exview[i]:
+                e.setToolTip('The current exchange matrix')
         # Enforce symmetry button
         self.symmetry = QCheckBox("Enforce Symmetry", self)
+        self.symmetry.setToolTip('If symmetry is on then you only need to\n'
+                                 'manually set the upper triangle of the\n'
+                                 'exchange matrix.  Thse values are mirrored\n'
+                                 'in the lower triangle and the diagonals\n'
+                                 'are automatically set so that each row\n'
+                                 'sums to 1.\n'
+                                 'Otherwise you must set every element')
         # Exchange picker
         self.exchooser = QComboBox(self)
+        self.exchooser.setToolTip('Choose between which two peaks to set '
+                                  'the exchange (relative) rate')
         # Exchange value
         self.exvalue = QLineEdit(self)
+        self.exvalue.setToolTip('The exchange (relative) rate')
         self.exvalue.setValidator(QDoubleValidator(0.0, 1.0, 3, self.exvalue))
 
     def makeConnections(self):

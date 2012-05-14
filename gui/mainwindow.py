@@ -76,6 +76,8 @@ class MainWindow(QMainWindow):
 
         # The window will own a button to clear raw data
         self.clear = QPushButton('Clear Raw Data', self)
+        self.clear.setToolTip('Remove raw data from the plot '
+                              'if there is any')
 
     def _initUI(self):
         '''Sets up the layout of the window'''
@@ -128,12 +130,14 @@ class MainWindow(QMainWindow):
         open = QAction('&Open', self)
         open.setShortcuts(QKeySequence.Open)
         open.triggered.connect(self.openFromInput)
+        open.setToolTip('Open an already made input file')
         self.fileMenu.addAction(open)
 
         # Save action
         save = QAction('&Save', self)
         save.setShortcuts(QKeySequence.Save)
         save.triggered.connect(self.saveToInput)
+        save.setToolTip('Save settings to an input file')
         self.fileMenu.addAction(save)
 
         # Save action
@@ -148,18 +152,22 @@ class MainWindow(QMainWindow):
         imp = QAction('&Import raw XY data', self)
         imp.setShortcut(QKeySequence('Ctrl+I'))
         imp.triggered.connect(self.importXYData)
+        imp.setToolTip('Import raw data an plot alongside calculated data')
         self.fileMenu.addAction(imp)
 
         # Export action
         exp = QAction('&Export calculated XY data', self)
         exp.setShortcut(QKeySequence('Ctrl+E'))
         exp.triggered.connect(self.exportXYData)
+        exp.setToolTip('Export calculated data to a file for use elsewhere')
         self.fileMenu.addAction(exp)
 
         # Make script action
         scr = QAction('Make Sc&ript', self)
         scr.setShortcut(QKeySequence('Ctrl+R'))
         scr.triggered.connect(self.makeScript)
+        scr.setToolTip('Create a python script that directly recreates this '
+                       'spectrum')
         self.fileMenu.addAction(scr)
 
         # Menu seperator
