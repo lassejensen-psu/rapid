@@ -9,9 +9,19 @@ from setuptools import setup
 
 APP = ['spectral_exchange.py']
 DATA_FILES = []
-OPTIONS = {'argv_emulation': True,
-           'includes' : ['sip', 'PyQt4.Qt', 'PyQt4.QtGui', 
-                         'PyQt4.QtCore', 'PyQt4.Qwt5', 'PyQt4.Qwt5._iqt']}
+OPTIONS = {'arch': 'i386',
+           'argv_emulation': True,
+           'no_strip': True, 
+           'includes' : ['sip'],
+           'packages' : [
+                         'PyQt4',
+                         #'PyQt4.Qt',
+                         #'PyQt4.QtGui',
+                         #'PyQt4.QtCore',
+                         #'PyQt4.Qwt5',
+                         #'PyQt4.Qwt5._iqt',
+                        ],
+          }
 
 setup(
     app=APP,
