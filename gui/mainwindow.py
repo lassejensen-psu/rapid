@@ -314,7 +314,7 @@ class MainWindow(QMainWindow):
         self.rawName = s
 
         # Load raw data and plot in a second curve
-        rawData = loadtxt(str(f))
+        rawData = loadtxt(str(self.rawName))
         self.plot.plotRawData(rawData[:,0], rawData[:,1])
         self.clear.setEnabled(True)
 
