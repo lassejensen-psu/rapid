@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 from textwrap import dedent
 from numpy import set_string_function
-from utils import normalize, clip, numerics
+from utils import numerics
 
 def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
     '''Saves a python script capable of generating a plot of the parameters'''
@@ -27,8 +27,6 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
     # Determine how to plot
     if raw is not None:
         plot = "plot(x, y, 'b-', xraw, yraw, 'g-', lw=1.5)"
-        raw = clip(raw, xlim)
-        raw[:,1] = normalize(args.raw[:,1])
     else:
         plot = "plot(x, y, 'b-', lw=1.5)"
 

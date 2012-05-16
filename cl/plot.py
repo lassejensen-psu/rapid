@@ -10,15 +10,7 @@ def plot(args, x, y):
         print('It appears that you are missing matplotlib.', file=stderr)
         print('You should install it using your favorite method', file=stderr)
         return 1
-    from common import normalize, clip
     
-    # Normalize the generated data
-    y = normalize(y)
-    # Repeat for the raw data if given.  Clip according to the xlimits
-    if args.raw is not None:
-        args.raw = clip(args.raw, args.xlim)
-        args.raw[:,1] = normalize(args.raw[:,1])
-
     # 14 point font size
     rc('font', **{'size': 14})
 

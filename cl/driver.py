@@ -2,7 +2,7 @@ from __future__ import print_function
 from sys import stderr, stdout
 from numpy import arange
 from input_reader import ReaderError
-from common import spectrum, SpectrumError, ZMat, \
+from common import spectrum, SpectrumError, ZMat, normalize, clip, \
                    numerics, write_data, save_script, read_input
 from plot import plot
 
@@ -47,6 +47,13 @@ def run_non_interactive(input_file):
                   args.Gamma_Lorentz,
                   args.Gamma_Gauss,
                   args.heights)
+
+    # Normalize the generated data
+    I_omega = normalize(I_omega)
+    # Repeat for the raw data if given.  Clip according to the xlimits
+    if args.raw is not None:
+        args.raw = clip(args.raw, args.xlim)
+        args.raw[:,1] = normalize(args.raw[:,1])
 
     # Plot the data or write to file
     if args.data:
