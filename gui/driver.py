@@ -10,6 +10,9 @@ def run_gui():
         print("Cannot find PyQt4", file=stderr)
         print("You must install this to run the GUI", file=stderr)
         return 1
+    # Start the actual event loop
+    app = QApplication(argv)
+
     # For good measure, try to find PyQwt5 now as a check
     try:
         import PyQt4.Qwt5
@@ -18,8 +21,7 @@ def run_gui():
         print("You must install this to run the GUI", file=stderr)
         return 1
 
-    # The actual event loop
-    app = QApplication(argv)
+    # Create the GUI window
     from mainwindow import MainWindow
     window = MainWindow()
     window.show()
