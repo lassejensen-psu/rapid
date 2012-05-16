@@ -241,7 +241,8 @@ class MainWindow(QMainWindow):
         # Plot raw data if it exists
         if args.raw is not None:
             self.rawName = args.rawName
-            self.plot.plotRawData(args.raw[:,0], args.raw[:,1])
+            self.plot.setRawData(args.raw)
+            self.plot.plotRawData()
             self.clear.setEnabled(True)
 
         # Set the limits
@@ -315,7 +316,8 @@ class MainWindow(QMainWindow):
 
         # Load raw data and plot in a second curve
         rawData = loadtxt(str(self.rawName))
-        self.plot.plotRawData(rawData[:,0], rawData[:,1])
+        self.plot.setRawData(rawData)
+        self.plot.plotRawData()
         self.clear.setEnabled(True)
 
     def makeScript(self):

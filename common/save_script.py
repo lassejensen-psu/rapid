@@ -73,7 +73,7 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
     # Print off the arrays
     print('# The frequencies for the predicted spectra', file=out)
     print('x =', x, file=out)
-    print('y =', normalize(y), file=out)
+    print('y =', y, file=out)
 
     # Print off raw data arrays if necessary
     if raw is not None:

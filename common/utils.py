@@ -28,7 +28,7 @@ def numerics(old_params, new_params, out):
         print(sr.format('Rel. Height',   h[i]),   file=out)
     return 0
 
-def normalize(y, x=None, xlimits=None):
+def normalize(y):
     '''Normalizes a data set.  Clips according to x-values if given.''' 
     # Set baseline to zero.
     y = y - y.min()

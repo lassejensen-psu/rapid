@@ -3,6 +3,7 @@ from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
 from numpy import array
 from common import normalize, clip
+from guicommon import error
 
 class Plot(QwtPlot):
     '''A plot'''
@@ -18,6 +19,7 @@ class Plot(QwtPlot):
         # Add a title if given
         if title:
             self.setTitle(title)
+        self.rawData = None
 
         # Set the axes for the intial data
         self.setAxisTitle(self.xBottom, "Frequency (Wavenumbers)")
@@ -58,6 +60,27 @@ class Plot(QwtPlot):
         y = array(self.raw.data().yData())
         return array([x, y]).T
 
+    def setRawData(self, raw):
+        '''Stores the raw data internally'''
+        self.rawData = raw
+
+    def plotRawData(self):
+        '''Plot the raw data'''
+        if self.rawData is None:
+            error.showMessage("Cannot plot raw data, none has been given")
+            return
+        s = self.axisScaleDiv(self.xBottom)
+        xlim = [s.lowerBound(), s.upperBound()]
+        if xlim[0] > xlim[1]:
+            xlim[0], xlim[1] = xlim[1], xlim[0]
+        # Clip the data to only the plotting window (to remove baseline)
+        raw = clip(self.rawData.copy(), xlim)
+        raw[:,1] = normalize(raw[:,1])
+        self.raw.setData(raw[:,0], raw[:,1])
+        if not self.raw.isVisible():
+            self.raw.show()
+        self.replot()
+
     #######
     # SLOTS
     #######
@@ -68,24 +91,10 @@ class Plot(QwtPlot):
         self.data.setData(x, y)
         self.replot()
 
-    def plotRawData(self, x, y):
-        '''Plot the raw data'''
-        y = normalize(y)
-        # Clip the data to only the plotting window (to remove baseline)
-        combined = array([[i, j] for i, j in zip(x, y)])
-        s = self.axisScaleDiv(self.xBottom)
-        xlim = s.lowerBound(), s.upperBound()
-        if xlim[0] > xlim[1]:
-            xlim[0], xlim[1] = xlim[1], xlim[0]
-        combined = clip(combined, xlim)
-        self.raw.setData(combined[:,0], combined[:,1])
-        if not self.raw.isVisible():
-            self.raw.show()
-        self.replot()
-
     def clearRawData(self):
         '''Clear the raw data'''
         self.raw.hide()
+        self.rawData = None
         self.replot()
 
     def changeScale(self, min, max, reversed):
@@ -95,6 +104,8 @@ class Plot(QwtPlot):
         else:
             self.setAxisScale(self.xBottom, min, max)
         self.replot()
+        if self.rawData is not None:
+            self.plotRawData()
 
     #########
     # SIGNALS
