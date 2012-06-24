@@ -5,6 +5,7 @@ def run_gui():
     '''Start the event loop to calucate spectra interactively'''
     # Import Qt functions.  Do so here to handle errors better
     try:
+        from PyQt4 import QtCore, QtGui, Qt
         from PyQt4.QtGui import QApplication
     except ImportError:
         print("Cannot find PyQt4", file=stderr)
@@ -15,7 +16,7 @@ def run_gui():
 
     # For good measure, try to find PyQwt5 now as a check
     try:
-        import PyQt4.Qwt5
+        from PyQt4 import Qwt5
     except ImportError:
         print("Cannot find PyQwt5", file=stderr)
         print("You must install this to run the GUI", file=stderr)
