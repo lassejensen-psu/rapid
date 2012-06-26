@@ -1,4 +1,4 @@
-from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve
+from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve, QwtPlotPicker
 from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
 from numpy import array
@@ -22,7 +22,7 @@ class Plot(QwtPlot):
         self.rawData = None
 
         # Set the axes for the intial data
-        self.setAxisTitle(self.xBottom, "Frequency (Wavenumbers)")
+        self.setAxisTitle(self.xBottom, "Frequency (Wavenumbers, cm<sup>-1</sup>)")
         self.setAxisTitle(self.yLeft, "Intensity (Normalized)")
         self.setAxisScale(self.yLeft, -0.1, 1.1)
 
@@ -47,6 +47,22 @@ class Plot(QwtPlot):
 
         # Make sure the plot is wide enough
         self.setMinimumWidth(800)
+
+        # Get a plot picker to get the current coordinates
+        self.picker = QwtPlotPicker(
+                        QwtPlot.xBottom,
+                        QwtPlot.yLeft,
+                        QwtPlotPicker.PointSelection | QwtPlotPicker.DragSelection,
+                        QwtPlotPicker.CrossRubberBand,
+                        QwtPlotPicker.ActiveOnly,
+                        self.canvas())
+        self.picker.setRubberBandPen(QPen(Qt.black))
+        self.picker.setTrackerPen(QPen(Qt.red))
+
+    def makeConnections(self):
+        '''Connect the plot together'''
+        self.picker.selected.connect(self.catchSelection)
+        self.picker.moved.connect(self.catchSelection)
 
     def calculatedData(self):
         '''Return the calculated data'''
@@ -107,7 +123,12 @@ class Plot(QwtPlot):
         if self.rawData is not None:
             self.plotRawData()
 
+    def catchSelection(self, point):
+        '''Catch a point and re-emit'''
+        self.pointPicked.emit(point.x(), point.y())
+
     #########
     # SIGNALS
     #########
 
+    pointPicked = pyqtSignal(float, float)

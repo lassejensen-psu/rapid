@@ -75,9 +75,19 @@ class ScaleView(QGroupBox):
         self.xmin.setValidator(QIntValidator(300, 3000, self.xmin))
         self.xmax.setValidator(QIntValidator(300, 3000, self.xmax))
 
+        # The wavelength selection
+        self.wavenum = QLineEdit('      ')
+        self.wavenum.setReadOnly(True)
+        self.intense = QLineEdit('     ')
+        self.intense.setReadOnly(True)
+
     def initUI(self):
         '''Lays out the widgets'''
         total = QHBoxLayout()
+        total.addWidget(QLabel("Wavenum: "))
+        total.addWidget(self.wavenum)
+        total.addWidget(QLabel("Intens.: "))
+        total.addWidget(self.intense)
         total.addWidget(QLabel("Lower Limit"))
         total.addWidget(self.xmin)
         total.addStretch()
@@ -120,3 +130,8 @@ class ScaleView(QGroupBox):
             error.showMessage(err)
             return
         self.model.setScale(xmin, xmax, reverse)
+
+    def setSelection(self, x, y):
+        '''Displays the current selection'''
+        self.wavenum.setText('{0:.1f}'.format(x))
+        self.intense.setText('{0:.3f}'.format(y))

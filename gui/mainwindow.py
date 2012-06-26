@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
         self.exchange.makeConnections()
         self.peak.makeConnections()
         self.scale.makeConnections()
+        self.plot.makeConnections()
 
         # The window will own a button to clear raw data
         self.clear = QPushButton('Clear Raw Data', self)
@@ -120,6 +121,10 @@ class MainWindow(QMainWindow):
 
         # Clear raw data if pushed
         self.clear.clicked.connect(self.clearRawData)
+
+        # If the plot is clicked, send info to the scale widget
+        self.plot.pointPicked.connect(self.scale.setSelection)
+
 
     def _makeMenu(self):
         '''Makes the menu bar for this widget'''
