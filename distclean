@@ -1,0 +1,23 @@
+#! /usr/bin/env python
+
+from glob import glob
+from os import remove
+from shutil import rmtree
+
+# Make a list of what to delete
+files = ('rapid', 'rapid.exe', ) + tuple(glob('logdict*'))
+dirs  = ('build', 'dist', 'collect', 'rapid.app', )
+
+# Removes the cmake files
+for f in files:
+    try:
+        remove(f)
+    except OSError:
+        pass
+
+# Removes the directories
+for d in dirs:
+    try:
+        rmtree(d)
+    except OSError:
+        pass
