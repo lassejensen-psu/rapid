@@ -1,24 +1,37 @@
 # -*- mode: python -*-
+import sys
 
-# This is the .spec file for PyInstaller, which is the only python
-# executable generator that I have found to work with both PyQwt and Mac
-a = Analysis(['../rapid/rapid.py'],
-             pathex=['/amphome/smm553/programming/pyinstaller'],
+# This spec file is designed to be run in this directory
+# The pathex list is empty because we cannot know where 
+# each user will place pyinstaller.
+a = Analysis(['rapid.py'],
+             pathex=[],
              hiddenimports=[],
              hookspath=None)
 pyz = PYZ(a.pure)
-exe = EXE(pyz,
-          a.scripts,
-          exclude_binaries=1,
-          name=os.path.join('build/pyi.linux2/rapid', 'rapid'),
-          debug=False,
-          strip=None,
-          upx=True,
-          console=True )
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=None,
-               upx=True,
-               name=os.path.join('dist', 'rapid'))
+
+# Mac OS X app bundle
+if sys.platform.startswith('darwin'):
+    pass
+
+# Not Mac OS X, single executable
+else:
+
+    # Windows has the .exe at the end of the name
+    if sys.platform.startswith('win'):
+        filename='rapid.exe'
+    else:
+        filename='rapid'
+
+    # Define how to create the single executable file
+    exe = EXE(pyz,
+              a.scripts,
+              a.binaries,
+              a.zipfiles,
+              a.datas,
+              name=filename,
+              debug=False,
+              strip=None,
+              upx=True,
+              console=False)
+
