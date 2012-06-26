@@ -30,3 +30,9 @@ pip-log.txt
 
 # Vi
 *.swp
+
+# Build stuff
+rapid
+rapid.app
+rapid.exe
+log*
