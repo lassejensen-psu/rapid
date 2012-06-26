@@ -70,7 +70,7 @@ class Plot(QwtPlot):
         y = array(self.data.data().yData())
         return x, y
 
-    def rawData(self):
+    def getRawData(self):
         '''Return the raw data in same format it was read in'''
         x = array(self.raw.data().xData())
         y = array(self.raw.data().yData())

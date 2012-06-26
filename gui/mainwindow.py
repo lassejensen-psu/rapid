@@ -32,6 +32,7 @@ class MainWindow(QMainWindow):
         self.scriptName = None
         self.expName = None
         self.rawName = None
+        self.rawExpName = None
 
         # Set initial number of peaks
         self.exchange.setNumPeaks(2)
@@ -157,9 +158,15 @@ class MainWindow(QMainWindow):
         # Import action
         imp = QAction('&Import raw XY data', self)
         imp.setShortcut(QKeySequence('Ctrl+I'))
-        imp.triggered.connect(self.importXYData)
+        imp.triggered.connect(self.importRawData)
         imp.setToolTip('Import raw data an plot alongside calculated data')
         self.fileMenu.addAction(imp)
+
+        # Export action
+        raw = QAction('Export Raw XY data', self)
+        raw.triggered.connect(self.exportRawData)
+        raw.setToolTip('Export raw data to a file for use elsewhere')
+        self.fileMenu.addAction(raw)
 
         # Export action
         exp = QAction('&Export calculated XY data', self)
@@ -308,7 +315,29 @@ class MainWindow(QMainWindow):
         except (IOError, OSError) as e:
             error.showMessage(str(e))
 
-    def importXYData(self):
+    def exportRawData(self):
+        '''Export current raw data to XY data'''
+        if self.plot.rawData is None:
+            error.showMessage('Cannot export.. there is no raw data to export yet')
+            return
+        filter = 'Data Files (*.txt *.data);;All (*)'
+        d = '' if self.rawExpName is None else self.rawExpName
+        s = QFileDialog.getSaveFileName(self, 'Export raw XY data',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.rawExpName = s
+
+        # Grab the raw XY data from the plot
+        data = self.plot.getRawData()
+        # Save in a standard format
+        try:
+            write_data(data[:,0], data[:,1], self.rawExpName)
+        except (IOError, OSError) as e:
+            error.showMessage(str(e))
+
+    def importRawData(self):
         '''Import data from an XY file'''
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.rawName is None else self.rawName
