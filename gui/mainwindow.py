@@ -2,7 +2,7 @@ from __future__ import division
 from sys import argv, stderr
 from os import environ
 from textwrap import dedent
-from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, \
+from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, QPrinter, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
                         QAction, QKeySequence, QFileDialog, QPushButton
 from PyQt4.Qt import qApp
@@ -29,6 +29,7 @@ class MainWindow(QMainWindow):
         self._makeMenu()
         self._makeConnections()
         self.fileName = None
+        self.pdfName = None
         self.scriptName = None
         self.expName = None
         self.rawName = None
@@ -150,7 +151,14 @@ class MainWindow(QMainWindow):
         # Save action
         saveas = QAction('Save As', self)
         saveas.triggered.connect(self.saveToInputAs)
+        save.setToolTip('Save settings to an input file of a new name')
         self.fileMenu.addAction(saveas)
+
+        # Save action
+        savepdf = QAction('Save as PDF', self)
+        savepdf.triggered.connect(self.saveAsPDF)
+        save.setToolTip('Save image to a PDF')
+        self.fileMenu.addAction(savepdf)
 
         # Menu seperator
         self.fileMenu.addSeparator()
@@ -163,7 +171,7 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(imp)
 
         # Export action
-        raw = QAction('Export Raw XY data', self)
+        raw = QAction('Export raw XY data', self)
         raw.triggered.connect(self.exportRawData)
         raw.setToolTip('Export raw data to a file for use elsewhere')
         self.fileMenu.addAction(raw)
@@ -204,7 +212,7 @@ class MainWindow(QMainWindow):
     def openFromInput(self):
         '''Open parameters from an input file'''
         filter = 'Input Files (*.inp);;All (*)'
-        s = QFileDialog.getOpenFileName(self, 'Open Input File',
+        s = QFileDialog.getOpenFileName(self, 'Input File Name',
                                               '', filter)
         # Continue unless the user hit cancel
         if not s:
@@ -283,7 +291,7 @@ class MainWindow(QMainWindow):
             return
         filter = 'Input Files (*.inp);;All (*)'
         d = '' if self.fileName is None else self.fileName
-        s = QFileDialog.getSaveFileName(self, 'Save Input File',
+        s = QFileDialog.getSaveFileName(self, 'Input File Name',
                                               d, filter)
         # Continue unless the user hit cancel
         if not s:
@@ -293,6 +301,30 @@ class MainWindow(QMainWindow):
         # Generate the input file
         self.inputGen(self.fileName)
 
+    def saveAsPDF(self):
+        '''Save plot as a PDF'''
+        if not self.control.hasPlot:
+            error.showMessage('Cannot save.. there is no data to save yet')
+            return
+        filter = 'PDF Documents (*.pdf);;All (*)'
+        d = '' if self.pdfName is None else self.pdfName
+        s = QFileDialog.getSaveFileName(self, 'PDF File Name',
+                                              d, filter)
+        # Continue unless the user hit cancel
+        if not s:
+            return
+        self.pdfName = s
+
+        # Set up the PDF printer
+        printer = QPrinter()
+        printer.setOutputFormat(QPrinter.PdfFormat)
+        printer.setOrientation(QPrinter.Landscape)
+        printer.setOutputFileName(self.pdfName)
+        printer.setCreator('RAPID')
+
+        # Send to the plot for printing
+        self.plot.print_(printer)
+
     def exportXYData(self):
         '''Export current spectrum to XY data'''
         if not self.control.hasPlot:
@@ -300,7 +332,7 @@ class MainWindow(QMainWindow):
             return
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.expName is None else self.expName
-        s = QFileDialog.getSaveFileName(self, 'Export calculated XY data',
+        s = QFileDialog.getSaveFileName(self, 'Calculated XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
         if not s:
@@ -322,7 +354,7 @@ class MainWindow(QMainWindow):
             return
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.rawExpName is None else self.rawExpName
-        s = QFileDialog.getSaveFileName(self, 'Export raw XY data',
+        s = QFileDialog.getSaveFileName(self, 'Raw XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
         if not s:
@@ -341,7 +373,7 @@ class MainWindow(QMainWindow):
         '''Import data from an XY file'''
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.rawName is None else self.rawName
-        s = QFileDialog.getOpenFileName(self, 'Import raw XY data',
+        s = QFileDialog.getOpenFileName(self, 'Raw XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
         if not s:
@@ -361,7 +393,7 @@ class MainWindow(QMainWindow):
             return
         filter = 'Python Scripts (*.py)'
         d = '' if self.scriptName is None else self.scriptName
-        s = QFileDialog.getSaveFileName(self, 'Make script',
+        s = QFileDialog.getSaveFileName(self, 'Python Script File Name',
                                               d, filter)
         # Continue unless the user hit cancel
         if not s:
