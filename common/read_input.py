@@ -58,7 +58,7 @@ def read_input(input_file):
                            dest='symmetric_exchange')
 
     # Actually read the input file
-    args, ifile = reader.read_input(input_file)
+    args = reader.read_input(input_file)
 
     # Make sure the filename was given correctly and read in data
     if args.raw:
