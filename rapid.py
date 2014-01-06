@@ -1,13 +1,15 @@
 #! /usr/bin/env python
 
-from __future__ import print_function, division
-from sys import argv, exit, stderr
-
 '''\
 Spectral exchange can be run from the command line non-interactively
 by giving it a text-based input file and having it generate data from
 the input, or it can be run as an interactive GUI.
 '''
+
+from __future__ import print_function, division
+from sys import argv, exit, stderr
+
+__version__ = '0.9'
 
 if __name__ == '__main__':
 
@@ -42,5 +44,8 @@ if __name__ == '__main__':
 
     # Otherwise, run the GUI
     else:
+        if argv[1] in ('-v', '--version'):
+            print('RAPID: version {0}'.format(__version__))
+            exit(0)
         from cl import run_non_interactive
         exit(run_non_interactive(argv[1]))
