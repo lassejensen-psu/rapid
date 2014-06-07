@@ -1,12 +1,18 @@
-from __future__ import print_function
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import stdout
 from math import pi
+
+# Non-std. lib imports
 from numpy import array, loadtxt
 from input_reader import InputReader, SUPPRESS, ReaderError, \
                          range_check, abs_file_path
+
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 ) # Hz to cm^{-1} conversion
 
 __all__ = ['read_input', 'ReaderError']
+
 
 def read_input(input_file):
     '''Defines what to expect from the input file and then
@@ -30,13 +36,6 @@ def read_input(input_file):
     # The range of the X-axis
     reader.add_line_key('xlim', type=[int, int], default=(1900, 2000))
     reader.add_boolean_key('reverse', action=True, default=False)
-
-    # Plot data to screen,output to txt file, or to a script.
-    # The default is to screen.
-    outformat = reader.add_mutually_exclusive_group()
-    outformat.add_line_key('data', type=str, case=True)
-    outformat.add_line_key('save_plot_script', type=str, case=True)
-    outformat.add_boolean_key('parameters', action=True, default=False)
 
     # Read in the raw data.  
     reader.add_line_key('raw', type=[], glob={'len':'*', 'join':True, },
@@ -141,7 +140,7 @@ def read_input(input_file):
     args.add('exchanges', array(ex, dtype=int))
     args.add('exchange_rates', array(rates))
 
-    # Make sure the xlimits are asending
+    # Make sure the xlimits are ascending
     try:
         range_check(args.xlim[0], args.xlim[1])
     except ValueError:

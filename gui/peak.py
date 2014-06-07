@@ -1,14 +1,20 @@
+from __future__ import print_function, division, absolute_import
+
+# Non-std. lib imports
 from PyQt4.QtCore import pyqtSignal, QObject
 from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
                         QDoubleValidator, QLabel, QGridLayout
 from numpy import asarray, nan
-from guicommon import toolTipText as ttt
+
+# Local imports
+from .guicommon import toolTipText as ttt
+
 
 class PeakView(QTabWidget):
     '''Class to display the peak information'''
 
     def __init__(self, parent = None):
-        '''Initiallize'''
+        '''Initialize'''
         super(QTabWidget, self).__init__(parent)
         self._createWidgets()
 
@@ -28,7 +34,7 @@ class PeakView(QTabWidget):
         self.npeaks = 2
 
     def makeConnections(self):
-        '''Connect all the contained widgets togeter'''
+        '''Connect all the contained widgets together'''
         self.model.newParams.connect(self.distributeNewParams)
         self.model.changeNumPeaks.connect(self.changePeakNum)
         self.pages[0].changeInputParams.connect(self.model.setInputParams)
@@ -81,11 +87,12 @@ class PeakView(QTabWidget):
                 self.removeTab(3)
                 self.npeaks = 3
 
+
 class PeakPage(QWidget):
     '''A peak page widget'''
 
     def __init__(self, title, ID):
-        '''Initiallize'''
+        '''Initialize'''
         super(QWidget, self).__init__()
         self.title = title
         self.ID = ID
@@ -155,7 +162,7 @@ class PeakPage(QWidget):
         self.setLayout(lo)     
 
     def _makeConnections(self):
-        '''Connect the conatined widgets together'''
+        '''Connect the contained widgets together'''
         self.inputpeak.editingFinished.connect(self.inputParamsChanged)
         self.inputGL.editingFinished.connect(self.inputParamsChanged)
         self.inputGG.editingFinished.connect(self.inputParamsChanged)
@@ -200,11 +207,12 @@ class PeakPage(QWidget):
     # Signals for when a value is changed
     changeInputParams = pyqtSignal(int, float, float, float, float)
 
+
 class PeakModel(QObject):
     '''Class to hold all information about the peaks'''
 
     def __init__(self, parent = None):
-        '''Initiallize the function class'''
+        '''Initialize the function class'''
         super(QObject, self).__init__(parent)
         self.npeaks = 0
         #self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]

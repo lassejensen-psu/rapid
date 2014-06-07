@@ -36,24 +36,6 @@ exchange 2 3 0.0
 #exchange 2 3 0.0283
 #exchange 1 3 0.0096
 
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-# The keyword extra_numbers will print to screen some extra
-# numerical data to give you an idea of what is going on.
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-#save_plot_script script.py
-
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-# The keyword parameters will print the new parameters to screen
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-#parameters
-
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-# The keyword data gives the name of the file that you wish
-# to put the spectral data into.  If you omit this keyword,
-# a plot is shown on the screen.
-#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-#data results.txt
-
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 # This is the raw data file you wish to include.
 # It can be the absolute path or relative to this directory.

@@ -1,15 +1,21 @@
+from __future__ import print_function, division, absolute_import
+
+# Non-std. lib imports
 from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QLabel, \
                         QLineEdit, QIntValidator, QCheckBox
 from numpy import arange
-from guicommon import error
-from guicommon import toolTipText as ttt
+
+# Local imports
+from .guicommon import error
+from .guicommon import toolTipText as ttt
+
 
 class Scale(QObject):
     '''Class to hold all information about the function'''
 
     def __init__(self, parent = None):
-        '''Initiallize the function class'''
+        '''Initialize the function class'''
         super(QObject, self).__init__(parent)
         self.xmin = 1800
         self.xmax = 2100
@@ -48,11 +54,12 @@ class Scale(QObject):
 # The scale view
 #/\/\/\/\/\/\/\/
 
+
 class ScaleView(QGroupBox):
     '''The box containing the rate value'''
 
     def __init__(self, title = 'Window Limits', parent = None):
-        '''Initiallize'''
+        '''Initialize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()

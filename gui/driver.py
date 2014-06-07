@@ -1,5 +1,8 @@
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import argv, stderr
+
 
 def run_gui():
     '''Start the event loop to calucate spectra interactively'''
@@ -23,7 +26,7 @@ def run_gui():
         return 1
 
     # Create the GUI window
-    from mainwindow import MainWindow
+    from .mainwindow import MainWindow
     window = MainWindow()
     window.show()
     window.raise_()

@@ -1,12 +1,19 @@
-from __future__ import print_function, division
-from textwrap import dedent
-from numpy import set_string_function
-from utils import numerics
+from __future__ import print_function, division, absolute_import
 
-def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
+# Std. lib imports
+from textwrap import dedent
+
+# Non-std. lib imports
+from numpy import set_string_function
+
+# Local imports
+from .utils import numerics
+
+
+def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile, msg=False):
     '''Saves a python script capable of generating a plot of the parameters'''
 
-    # Output a script to replot
+    # Output a script to re-plot
     out = open(scriptfile, 'w')
 
     # Make the file header
@@ -86,5 +93,11 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile):
                  if __name__ == '__main__':
                      make_plot()
                  '''), file=out)
+
+    # Close the file
+    out.close()
+
+    if msg:
+        print('Data written to file {0}'.format(scriptfile))
 
     return 0

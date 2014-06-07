@@ -1,5 +1,8 @@
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import stderr
+
 
 def plot(args, x, y):
     '''Plots the normalized data.'''

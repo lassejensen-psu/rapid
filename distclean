@@ -5,8 +5,8 @@ from os import remove
 from shutil import rmtree
 
 # Make a list of what to delete
-files = ('rapid', 'rapid.exe', ) + tuple(glob('logdict*'))
-dirs  = ('build', 'dist', 'rapid.app', )
+files = ('rapid.exe', ) + tuple(glob('logdict*'))
+dirs  = ('build', 'dist', )
 
 # Removes the cmake files
 for f in files:

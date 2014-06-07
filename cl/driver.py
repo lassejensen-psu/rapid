@@ -1,24 +1,31 @@
-from __future__ import print_function
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import stderr, stdout
+
+# Non-std. lib imports
 from numpy import arange
 from input_reader import ReaderError
+
+# Local imports
 from common import spectrum, SpectrumError, ZMat, normalize, clip, \
                    numerics, write_data, save_script, read_input
-from plot import plot
+from .plot import plot
 
-def run_non_interactive(input_file):
+
+def run_non_interactive(cmd_line_args):
     '''Driver to calculate the spectra non-interactively
     (i.e. from the command line).
     '''
 
     # Read in the input file that is given
     try:
-        args = read_input(input_file)
+        args = read_input(cmd_line_args.input_file)
     except (OSError, IOError) as e:
-        print(str(e), file=stderr) # An error occured when locating the file
+        print(str(e), file=stderr) # An error occurred when locating the file
         return 1
     except ReaderError as r:
-        print(str(r), file=stderr) # An error occured when reading the file
+        print(str(r), file=stderr) # An error occurred when reading the file
         return 1
 
     # Generate the Z matrix
@@ -56,19 +63,20 @@ def run_non_interactive(input_file):
         args.raw[:,1] = normalize(args.raw[:,1])
 
     # Plot the data or write to file
-    if args.data:
+    if cmd_line_args.data:
         try:
-            write_data(omega, I_omega, args.data)
+            write_data(omega, I_omega, cmd_line_args.data)
         except (IOError, OSError) as e:
             print(str(e), file=stderr)
             return 1
         else:
-            print('Data written to file {0}'.format(args.data))
+            print('Data written to file {0}'.format(cmd_line_args.data))
             return 0
-    elif args.save_plot_script:
+    elif cmd_line_args.script:
         return save_script(omega, I_omega, args.raw, args.xlim, args.reverse,
-                           old_params, new_params, args.save_plot_script)
-    elif args.parameters:
+                           old_params, new_params, cmd_line_args.script,
+                           msg=True)
+    elif cmd_line_args.params:
         return numerics(old_params, new_params, stdout)
     else:
         return plot(args, omega, I_omega)

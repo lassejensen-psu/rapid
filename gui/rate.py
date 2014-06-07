@@ -1,18 +1,27 @@
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
+from math import pi
+
+# Non-std. lib imports 
 from PyQt4.QtCore import pyqtSignal, QObject, QString
 from PyQt4.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
                         QComboBox, QRadioButton, QStringListModel, \
                         QLineEdit, QDoubleValidator, QGridLayout
-from guicommon import error
-from guicommon import toolTipText as ttt
 from numpy.testing import assert_approx_equal
-from math import pi
+
+# Local imports
+from .guicommon import error
+from .guicommon import toolTipText as ttt
+
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
+
 
 class Rate(QObject):
     '''Class to hold all information about the function'''
 
     def __init__(self, parent = None):
-        '''Initiallize the function class'''
+        '''Initialize the function class'''
         super(QObject, self).__init__(parent)
         self.converter = lambda x: x
         self.lunits = QStringListModel(QString('s ns ps fs').split(' '))
@@ -74,11 +83,12 @@ class Rate(QObject):
 # The rate view
 #/\/\/\/\/\/\/\
 
+
 class RateView(QGroupBox):
     '''The box containing the rate value'''
 
     def __init__(self, title = 'Rate', parent = None):
-        '''Initiallize'''
+        '''Initialize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()
@@ -126,7 +136,7 @@ class RateView(QGroupBox):
         '''Connect the widgets together'''
 
         # When one radio button is checked, change the combo box model
-        # and unche the other radio button
+        # and un-check the other radio button
         self.rate.clicked.connect(self.setRateModel)
         self.lifetime.clicked.connect(self.setLifetimeModel)
 

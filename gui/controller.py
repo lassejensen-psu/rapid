@@ -1,17 +1,22 @@
+from __future__ import print_function, division, absolute_import
+
+# Non-std. lib imports
 from PyQt4.QtCore import pyqtSignal, QObject
 from numpy import ndarray, isnan, sum
-from peak import PeakModel
-from exchange import ExchangeModel, NumPeaks
-from rate import Rate
-from scale import Scale
+
+# Local imports
 from common import spectrum
+from .peak import PeakModel
+from .exchange import ExchangeModel, NumPeaks
+from .rate import Rate
+from .scale import Scale
 
 
 class Controller(QObject):
     '''Class to hold all information about the function'''
 
     def __init__(self, parent):
-        '''Initiallize the controller class'''
+        '''Initialize the controller class'''
         super(QObject, self).__init__(parent)
         self.rate = Rate(self)
         self.numpeaks = NumPeaks(self)
@@ -34,7 +39,7 @@ class Controller(QObject):
         # When the number of peaks changes, also change the number of tab pages
         self.numpeaks.numberOfPeaksChanged.connect(self.peak.changePeakNum)
 
-        # When any of the values are updated, replot
+        # When any of the values are updated, re-plot
         self.rate.rateChanged.connect(self.setDataForPlot)
         self.exchange.matrixChanged.connect(self.setDataForPlot)
         self.peak.inputParamsChanged.connect(self.setDataForPlot)
@@ -103,7 +108,7 @@ class Controller(QObject):
         self.limits = self.scale.getScale()
 
     def changeScale(self, recalculate):
-        '''Emit the new scale to use after replotting with new domain'''
+        '''Emit the new scale to use after re-plotting with new domain'''
         if recalculate:
             self.setDataForPlot()
         min, max, rev = self.scale.getScale()

@@ -1,24 +1,33 @@
-from __future__ import division
-from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant, QRegExp
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from math import pi
 from textwrap import dedent
+
+# Non-std. lib imports
+from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant, QRegExp
 from PyQt4.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
                         QLineEdit, QComboBox, QStringListModel, QCheckBox, \
                         QGridLayout, QDoubleValidator, QRadioButton
 from numpy.testing import assert_approx_equal
 from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
+
+# Local imports
 from common import ZMat
-from guicommon import error
-from guicommon import toolTipText as ttt
+from .guicommon import error
+from .guicommon import toolTipText as ttt
+
+
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
 indexrole = Qt.UserRole
 raterole = Qt.UserRole+1
+
 
 class ExchangeView(QGroupBox):
     '''The box containing the rate value'''
 
     def __init__(self, title = 'Peak Exchange Matrix', parent = None):
-        '''Initiallize'''
+        '''Initialize'''
         super(QGroupBox, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()
@@ -59,8 +68,7 @@ class ExchangeView(QGroupBox):
 
     def makeConnections(self):
         '''Connect the widgets together'''
-
-        # When the table has been resixed, tidy it up
+        # When the table has been resized, tidy it up
         self.matrix.matrixChanged.connect(self.resetMatrix)
         # If the check state changed, change the data model
         self.symmetry.stateChanged.connect(self.changeDataModel)
@@ -191,6 +199,7 @@ class ExchangeView(QGroupBox):
 # NumPeaks Model
 #/\/\/\/\/\/\/\/
 
+
 class NumPeaks(QObject):
     '''Class to hold all information about the function'''
 
@@ -222,6 +231,7 @@ class NumPeaks(QObject):
 #/\/\/\/\/\/\/\/
 # Exchange Model
 #/\/\/\/\/\/\/\/
+
 
 class ExchangeModel(QObject):
     '''Class to hold all information about the function'''

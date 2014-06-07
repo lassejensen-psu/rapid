@@ -1,15 +1,21 @@
+from __future__ import print_function, division, absolute_import
+
+# Non-std. lib imports
 from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve, QwtPlotPicker
 from PyQt4.Qt import QFrame, QPalette, QColor, QPen
 from PyQt4.QtCore import Qt, pyqtSignal
 from numpy import array
+
+# Local imports
 from common import normalize, clip
-from guicommon import error
+from .guicommon import error
+
 
 class Plot(QwtPlot):
     '''A plot'''
 
     def __init__(self, parent, title = ''):
-        '''Initiallize the plot and it's parent class'''
+        '''Initialize the plot and it's parent class'''
         super(QwtPlot, self).__init__(parent)
         self._setupPlot(title)
 

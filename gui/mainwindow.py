@@ -1,28 +1,35 @@
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import argv, stderr
 from os import environ
 from textwrap import dedent
+
+# Non-std. lib imports
 from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, QPrinter, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
                         QAction, QKeySequence, QFileDialog, QPushButton
 from PyQt4.Qt import qApp
 from numpy import loadtxt, array
 from input_reader import ReaderError
-from plot import Plot
-from rate import RateView
-from exchange import ExchangeView
-from scale import ScaleView
-from peak import PeakView
-from controller import Controller
+
+# Local imports
 from common import save_script, read_input, ZMat, write_data
-from guicommon import error
-from guicommon import toolTipText as ttt
+from .plot import Plot
+from .rate import RateView
+from .exchange import ExchangeView
+from .scale import ScaleView
+from .peak import PeakView
+from .controller import Controller
+from .guicommon import error
+from .guicommon import toolTipText as ttt
+
 
 class MainWindow(QMainWindow):
     '''The main window of the program'''
 
     def __init__(self):
-        '''Initiallize the main window and it's parents'''
+        '''Initialize the main window and it's parents'''
         super(MainWindow, self).__init__()
         self._createtWidgets()
         self._initUI()
@@ -160,7 +167,7 @@ class MainWindow(QMainWindow):
         save.setToolTip('Save image to a PDF')
         self.fileMenu.addAction(savepdf)
 
-        # Menu seperator
+        # Menu separator
         self.fileMenu.addSeparator()
 
         # Import action
@@ -191,7 +198,7 @@ class MainWindow(QMainWindow):
                        'spectrum')
         self.fileMenu.addAction(scr)
 
-        # Menu seperator
+        # Menu separator
         self.fileMenu.addSeparator()
 
         # Quit action
@@ -267,12 +274,6 @@ class MainWindow(QMainWindow):
 
         # Set the limits
         self.scale.setValue(args.xlim[0], args.xlim[1], args.reverse)
-
-        # Default the script file name or data file nameif given
-        if args.data:
-            self.expName = args.data
-        elif args.save_plot_script:
-            self.scriptName = args.args.save_plot_script
 
     def saveToInput(self):
         '''Save current settings to current input file if available'''

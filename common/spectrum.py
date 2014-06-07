@@ -1,15 +1,21 @@
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import exit
 from math import sqrt, log, pi
+
+# Non-std lib imports
 from scipy.linalg import eig, inv
 from scipy.special import wofz
 from numpy import array, argsort, diag, dot, eye, zeros
 
-# A few constats
+
+# A few constants
 SQRT2LOG2_2 = sqrt(2 * log(2)) * 2
 INVSQRT2LOG2_2 = 1 / SQRT2LOG2_2
 SQRT2 = sqrt(2)
 SQRT2PI = sqrt(2 * pi)
+
 
 def ZMat(npeaks, peak_exchanges, relative_rates, symmetric):
     '''Construct the Z matrix.  Symmetry can be enforced or not.'''
@@ -38,6 +44,7 @@ def ZMat(npeaks, peak_exchanges, relative_rates, symmetric):
             Z[index[0],index[1]] = rate
         
     return Z
+
 
 def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights, omega):
     '''This routine contains the code that drives the actual calculation
@@ -87,7 +94,7 @@ def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights, omega):
         sigmas = [1 / sqrt(x) for x in Gprime]
     except ValueError:
         # I'm not sure this is a problem anymore, but this happened at some
-        # stage of developement
+        # stage of development
         raise SpectrumError('The input parameters for this system are '
                             'not physical.\nTry increasing the Gaussian '
                             'line widths')
@@ -96,14 +103,15 @@ def spectrum(Z, k, vib, Gamma_Lorentz, Gamma_Gauss, heights, omega):
     GG = [SQRT2LOG2_2 * x for x in sigmas]
     new_params = peaks, GL, GG, [x.real for x in h]
 
-    ###############################################
-    # Use these new values to calucate the spectrum
-    ###############################################
+    ################################################
+    # Use these new values to calculate the spectrum
+    ################################################
 
     # Return the sum of voigt profiles for each peak,
     # along with the new parameters
     return (array([voigt(omega, j, h, peaks, HWHM, sigmas) for j in N]).sum(0),
             new_params)
+
 
 def voigt(freq, j, height, vib, HWHM, sigma):
     '''Return a Voigt line shape over a given domain about a given vib'''
@@ -114,14 +122,13 @@ def voigt(freq, j, height, vib, HWHM, sigma):
     # scaling factors.  It is multiplied by the height here.
     return ( height[j].conjugate() * wofz(z) ).real / ( SQRT2PI * sigma[j] )
 
+
 def height(j, heights, S, Sinv):
     '''Return the modified peak height'''
     N = range(len(heights))
     return sum([heights[a] * S[a,j] * Sinv[j,ap] for a in N for ap in N])
 
+
 class SpectrumError(Exception):
     '''An exception for making the spectrum'''
-    def __init__(self, msg):
-        self.msg = msg
-    def __str__(self):
-        return self.msg
+    pass

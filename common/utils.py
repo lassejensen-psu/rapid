@@ -1,12 +1,18 @@
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
+
+# Std. lib imports
 from sys import stderr
+
+# Non-std. lib imports
 from numpy import where, savetxt, array
+
 
 def write_data(x, y, datafile):
     '''Writes the normalized data to file.'''
 
     # Write the data to file. 
     savetxt(str(datafile), array([x, y]).T, fmt='%.1f %.16f')
+
 
 def numerics(old_params, new_params, out):
     '''Make a nice table of the old and new data'''
@@ -28,12 +34,14 @@ def numerics(old_params, new_params, out):
         print(sr.format('Rel. Height',   h[i]),   file=out)
     return 0
 
+
 def normalize(y):
     '''Normalizes a data set.  Clips according to x-values if given.''' 
     # Set baseline to zero.
     y = y - y.min()
     # Normalize
     return y / y.max()
+
 
 def clip(xy, xlimits):
     '''Clips according to x-values.'''

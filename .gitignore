@@ -30,7 +30,6 @@ pip-log.txt
 *.swp
 
 # Build stuff
-rapid
 rapid.app
 rapid.exe
 log*
