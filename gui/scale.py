@@ -1,8 +1,8 @@
 from __future__ import print_function, division, absolute_import
 
 # Non-std. lib imports
-from PyQt4.QtCore import pyqtSignal, QObject, QString
-from PyQt4.QtGui import QGroupBox, QHBoxLayout, QLabel, \
+from PySide.QtCore import Signal, QObject
+from PySide.QtGui import QGroupBox, QHBoxLayout, QLabel, \
                         QLineEdit, QIntValidator, QCheckBox
 from numpy import arange
 
@@ -16,7 +16,7 @@ class Scale(QObject):
 
     def __init__(self, parent = None):
         '''Initialize the function class'''
-        super(QObject, self).__init__(parent)
+        super(Scale, self).__init__(parent)
         self.xmin = 1800
         self.xmax = 2100
         self.reverse = False
@@ -48,7 +48,7 @@ class Scale(QObject):
     #########
 
     # The rate changed
-    scaleChanged = pyqtSignal(bool)
+    scaleChanged = Signal(bool)
 
 #/\/\/\/\/\/\/\/
 # The scale view
@@ -60,7 +60,7 @@ class ScaleView(QGroupBox):
 
     def __init__(self, title = 'Window Limits', parent = None):
         '''Initialize'''
-        super(QGroupBox, self).__init__(parent)
+        super(ScaleView, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()
 
@@ -121,7 +121,7 @@ class ScaleView(QGroupBox):
         self.xmin.setText(str(xmin))
         self.xmax.setText(str(xmax))
         self.reverse.setChecked(reversed)
-        self.reverse.clicked.emit(reversed)
+        self.reverse.clicked.emit()
 
     #######
     # SLOTS
@@ -129,8 +129,8 @@ class ScaleView(QGroupBox):
 
     def resetScale(self):
         '''Checks that the given scale is valid, then resets if so'''
-        xmin = self.xmin.text().toInt()[0]
-        xmax = self.xmax.text().toInt()[0]
+        xmin = int(self.xmin.text())
+        xmax = int(self.xmax.text())
         reverse = self.reverse.isChecked()
         if xmin > xmax:
             err = "Lower limit cannot be greater than upper limit"

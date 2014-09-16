@@ -6,16 +6,16 @@ from os import environ
 from textwrap import dedent
 
 # Non-std. lib imports
-from PyQt4.QtGui import QMainWindow, QWidget, QVBoxLayout, QPrinter, \
+from PySide.QtGui import QMainWindow, QWidget, QVBoxLayout, QPrinter, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
-                        QAction, QKeySequence, QFileDialog, QPushButton
-from PyQt4.Qt import qApp
+                        QAction, QKeySequence, QFileDialog, QPushButton, \
+                        QApplication
 from numpy import loadtxt, array
 from input_reader import ReaderError
 
 # Local imports
 from common import save_script, read_input, ZMat, write_data
-from .plot import Plot
+# from .plot import Plot
 from .rate import RateView
 from .exchange import ExchangeView
 from .scale import ScaleView
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         '''Creates all the widgets'''
 
         # Make the views
-        self.plot = Plot(self)
+        # self.plot = Plot(self)
         self.rate = RateView(parent=self)
         self.exchange = ExchangeView(parent=self)
         self.peak = PeakView(parent=self)
@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
         self.exchange.makeConnections()
         self.peak.makeConnections()
         self.scale.makeConnections()
-        self.plot.makeConnections()
+        # self.plot.makeConnections()
 
         # The window will own a button to clear raw data
         self.clear = QPushButton('Clear Raw Data', self)
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
 
         # Add the plot 
         plot_lim = QVBoxLayout()
-        plot_lim.addWidget(self.plot)
+        # plot_lim.addWidget(self.plot)
         lim_clear = QHBoxLayout()
         lim_clear.addWidget(self.scale)
         lim_clear.addWidget(self.clear)
@@ -123,16 +123,16 @@ class MainWindow(QMainWindow):
         '''Connect the widgets to each other'''
 
         # When the controller says plot, plot
-        self.control.plotSpectrum.connect(self.plot.plotCalculatedData)
+        # self.control.plotSpectrum.connect(self.plot.plotCalculatedData)
 
         # When the controller says resize x limits, do so
-        self.control.newXLimits.connect(self.plot.changeScale)
+        # self.control.newXLimits.connect(self.plot.changeScale)
 
         # Clear raw data if pushed
         self.clear.clicked.connect(self.clearRawData)
 
         # If the plot is clicked, send info to the scale widget
-        self.plot.pointPicked.connect(self.scale.setSelection)
+        # self.plot.pointPicked.connect(self.scale.setSelection)
 
 
     def _makeMenu(self):
@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
         # Quit action
         quit = QAction('&Quit', self)
         quit.setShortcuts(QKeySequence.Quit)
-        quit.triggered.connect(qApp.quit)
+        quit.triggered.connect(QApplication.instance().quit)
         self.fileMenu.addAction(quit)
 
     #######
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
 
     def clearRawData(self):
         '''Clear the raw data from the plot'''
-        self.plot.clearRawData()
+        # self.plot.clearRawData()
         self.clear.setEnabled(False)
 
     def openFromInput(self):
@@ -268,8 +268,8 @@ class MainWindow(QMainWindow):
         # Plot raw data if it exists
         if args.raw is not None:
             self.rawName = args.rawName
-            self.plot.setRawData(args.raw)
-            self.plot.plotRawData()
+            # self.plot.setRawData(args.raw)
+            # self.plot.plotRawData()
             self.clear.setEnabled(True)
 
         # Set the limits
@@ -324,7 +324,7 @@ class MainWindow(QMainWindow):
         printer.setCreator('RAPID')
 
         # Send to the plot for printing
-        self.plot.print_(printer)
+        # self.plot.print_(printer)
 
     def exportXYData(self):
         '''Export current spectrum to XY data'''
@@ -350,9 +350,9 @@ class MainWindow(QMainWindow):
 
     def exportRawData(self):
         '''Export current raw data to XY data'''
-        if self.plot.rawData is None:
-            error.showMessage('Cannot export.. there is no raw data to export yet')
-            return
+        # if self.plot.rawData is None:
+        #     error.showMessage('Cannot export.. there is no raw data to export yet')
+            # return
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.rawExpName is None else self.rawExpName
         s = QFileDialog.getSaveFileName(self, 'Raw XY Data File Name',
@@ -363,7 +363,7 @@ class MainWindow(QMainWindow):
         self.rawExpName = s
 
         # Grab the raw XY data from the plot
-        data = self.plot.getRawData()
+        # data = self.plot.getRawData()
         # Save in a standard format
         try:
             write_data(data[:,0], data[:,1], self.rawExpName)
@@ -383,8 +383,8 @@ class MainWindow(QMainWindow):
 
         # Load raw data and plot in a second curve
         rawData = loadtxt(str(self.rawName))
-        self.plot.setRawData(rawData)
-        self.plot.plotRawData()
+        # self.plot.setRawData(rawData)
+        # self.plot.plotRawData()
         self.clear.setEnabled(True)
 
     def makeScript(self):
@@ -403,11 +403,11 @@ class MainWindow(QMainWindow):
 
         # Get parameters needed
         xlim, rev, oldp, newp = self.control.getParametersForScript()
-        x, y = self.plot.calculatedData()
-        if self.clear.isEnabled():
-            raw = self.plot.rawData()
-        else:
-            raw = None
+        # x, y = self.plot.calculatedData()
+        # if self.clear.isEnabled():
+        #     raw = self.plot.rawData()
+        # else:
+        #     raw = None
         save_script(x, y, raw, xlim, rev, oldp, newp, self.scriptName)
 
     def inputGen(self, fileName):

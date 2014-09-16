@@ -1,8 +1,8 @@
 from __future__ import print_function, division, absolute_import
 
 # Non-std. lib imports
-from PyQt4.QtCore import pyqtSignal, QObject
-from PyQt4.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
+from PySide.QtCore import Signal, QObject
+from PySide.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
                         QDoubleValidator, QLabel, QGridLayout
 from numpy import asarray, nan
 
@@ -15,7 +15,7 @@ class PeakView(QTabWidget):
 
     def __init__(self, parent = None):
         '''Initialize'''
-        super(QTabWidget, self).__init__(parent)
+        super(PeakView, self).__init__(parent)
         self._createWidgets()
 
     def _createWidgets(self):
@@ -93,7 +93,7 @@ class PeakPage(QWidget):
 
     def __init__(self, title, ID):
         '''Initialize'''
-        super(QWidget, self).__init__()
+        super(PeakPage, self).__init__()
         self.title = title
         self.ID = ID
         self._createWidgets()
@@ -190,22 +190,30 @@ class PeakPage(QWidget):
 
     def inputParamsChanged(self):
         '''Collects the parameters from this page and broadcasts them'''
-        vib = self.inputpeak.text().toFloat()
-        GL  = self.inputGL.text().toFloat()
-        GG  = self.inputGG.text().toFloat()
-        h   = self.inputH.text().toFloat()
-        # First check that float conversion was a success for all params
-        # Of not, don't pass on data
-        if not (vib[1] and GL[1] and GG[1] and h[1]):
+        try:
+            vib = float(self.inputpeak.text())
+        except ValueError:
             return
-        self.changeInputParams.emit(self.ID, vib[0], GL[0], GG[0], h[0])
+        try:
+            GL = float(self.inputGL.text())
+        except ValueError:
+            return
+        try:
+            GG = float(self.inputGG.text())
+        except ValueError:
+            return
+        try:
+            h = float(self.inputH.text())
+        except ValueError:
+            return
+        self.changeInputParams.emit(self.ID, vib, GL, GG, h)
 
     #########
     # SIGNALS
     #########
 
     # Signals for when a value is changed
-    changeInputParams = pyqtSignal(int, float, float, float, float)
+    changeInputParams = Signal(int, float, float, float, float)
 
 
 class PeakModel(QObject):
@@ -213,7 +221,7 @@ class PeakModel(QObject):
 
     def __init__(self, parent = None):
         '''Initialize the function class'''
-        super(QObject, self).__init__(parent)
+        super(PeakModel, self).__init__(parent)
         self.npeaks = 0
         #self.peaks    = [1960.0, 1980.0, 2000.0, 2020.0]
         self.peaks    = [nan, nan, nan, nan]
@@ -270,10 +278,10 @@ class PeakModel(QObject):
     #########
 
     # Release the parameters to calculate the spectrum
-    inputParamsChanged = pyqtSignal()
+    inputParamsChanged = Signal()
 
     # View the new parameters after exchange
-    newParams = pyqtSignal(list, list, list, list)
+    newParams = Signal(list, list, list, list)
 
     # Change the number of peaks
-    changeNumPeaks = pyqtSignal(int)
+    changeNumPeaks = Signal(int)

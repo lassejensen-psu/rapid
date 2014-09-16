@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import
 
 # Non-std. lib imports
-from PyQt4.QtCore import pyqtSignal, QObject
+from PySide.QtCore import Signal, QObject
 from numpy import ndarray, isnan, sum
 
 # Local imports
@@ -17,7 +17,7 @@ class Controller(QObject):
 
     def __init__(self, parent):
         '''Initialize the controller class'''
-        super(QObject, self).__init__(parent)
+        super(Controller, self).__init__(parent)
         self.rate = Rate(self)
         self.numpeaks = NumPeaks(self)
         self.exchange = ExchangeModel(self)
@@ -119,7 +119,7 @@ class Controller(QObject):
     #########
 
     # Plot the data
-    plotSpectrum = pyqtSignal(ndarray, ndarray)
+    plotSpectrum = Signal(ndarray, ndarray)
 
     # Change the scale
-    newXLimits = pyqtSignal(int, int, bool)
+    newXLimits = Signal(int, int, bool)

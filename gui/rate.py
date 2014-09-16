@@ -4,8 +4,8 @@ from __future__ import print_function, division, absolute_import
 from math import pi
 
 # Non-std. lib imports 
-from PyQt4.QtCore import pyqtSignal, QObject, QString
-from PyQt4.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
+from PySide.QtCore import Signal, QObject
+from PySide.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
                         QComboBox, QRadioButton, QStringListModel, \
                         QLineEdit, QDoubleValidator, QGridLayout
 from numpy.testing import assert_approx_equal
@@ -22,10 +22,10 @@ class Rate(QObject):
 
     def __init__(self, parent = None):
         '''Initialize the function class'''
-        super(QObject, self).__init__(parent)
+        super(Rate, self).__init__(parent)
         self.converter = lambda x: x
-        self.lunits = QStringListModel(QString('s ns ps fs').split(' '))
-        self.runits = QStringListModel(QString('Hz GHz THz PHz').split(' '))
+        self.lunits = QStringListModel('s ns ps fs'.split(' '))
+        self.runits = QStringListModel('Hz GHz THz PHz'.split(' '))
         self.method = ''
 
     def setConverter(self, unit):
@@ -77,7 +77,7 @@ class Rate(QObject):
     #########
 
     # The rate changed
-    rateChanged = pyqtSignal()
+    rateChanged = Signal()
 
 #/\/\/\/\/\/\/\
 # The rate view
@@ -89,7 +89,7 @@ class RateView(QGroupBox):
 
     def __init__(self, title = 'Rate', parent = None):
         '''Initialize'''
-        super(QGroupBox, self).__init__(parent)
+        super(RateView, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()
 
@@ -206,9 +206,10 @@ class RateView(QGroupBox):
     def emitRate(self):
         '''Converts the text to a float and emits'''
         # Do nothing if there is no number
-        newrate = self.rate_value.text().toFloat()
-        if newrate[1]:
-            self.model.setRate(newrate[0])
+        try:
+            self.model.setRate(float(self.rate_value.text()))
+        except ValueError:
+            pass
 
     def updateUnit(self):
         '''Update for a change of unit'''
@@ -217,9 +218,10 @@ class RateView(QGroupBox):
             unit = self.model.unit
         except AttributeError:
             self.model.setConverter(str(self.unit.currentText()))
-            newrate = self.rate_value.text().toFloat()
-            if newrate[1]:
-                self.model.setRate(newrate[0])
+            try:
+                self.model.setRate(float(self.rate_value.text()))
+            except ValueError:
+                pass
             return
         # Convert unit appropriately
         if self.rate.isChecked():
@@ -271,10 +273,11 @@ class RateView(QGroupBox):
         try:
             # Set the new converter, then change the rate
             self.model.setConverter(str(self.unit.currentText()))
-            newrate = self.rate_value.text().toFloat()
-            if newrate[1]:
-                self.model.setRate(newrate[0]
+            try:
+                self.model.setRate(float(self.rate_value.text())
                                  * conv[str(self.unit.currentText())])
+            except ValueError:
+                pass
         except KeyError:
             pass
 
@@ -292,8 +295,8 @@ class RateView(QGroupBox):
         self.unit.setCurrentIndex(indx)
         self.model.setConverter(self.model.unit)
         try:
-            self.model.setRate(1/self.rate_value.text().toFloat()[0])
-        except ZeroDivisionError:
+            self.model.setRate(1 / float(self.rate_value.text()))
+        except (ZeroDivisionError, ValueError):
             pass
 
     def setLifetimeModel(self):
@@ -307,6 +310,6 @@ class RateView(QGroupBox):
         self.unit.setCurrentIndex(indx)
         self.model.setConverter(self.model.unit)
         try:
-            self.model.setRate(1/self.rate_value.text().toFloat()[0])
-        except ZeroDivisionError:
+            self.model.setRate(1 / float(self.rate_value.text()))
+        except (ZeroDivisionError, ValueError):
             pass

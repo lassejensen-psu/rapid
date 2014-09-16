@@ -1,9 +1,9 @@
 from __future__ import print_function, division, absolute_import
 
 # Non-std. lib imports
-from PyQt4.Qwt5 import QwtPlot, QwtPlotCurve, QwtPlotPicker
-from PyQt4.Qt import QFrame, QPalette, QColor, QPen
-from PyQt4.QtCore import Qt, pyqtSignal
+from PySide.Qwt5 import QwtPlot, QwtPlotCurve, QwtPlotPicker
+from PySide.Qt import QFrame, QPalette, QColor, QPen
+from PySide.QtCore import Qt, Signal
 from numpy import array
 
 # Local imports
@@ -137,4 +137,4 @@ class Plot(QwtPlot):
     # SIGNALS
     #########
 
-    pointPicked = pyqtSignal(float, float)
+    pointPicked = Signal(float, float)

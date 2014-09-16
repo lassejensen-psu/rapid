@@ -5,8 +5,8 @@ from math import pi
 from textwrap import dedent
 
 # Non-std. lib imports
-from PyQt4.QtCore import pyqtSignal, QObject, QString, Qt, QVariant, QRegExp
-from PyQt4.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
+from PySide.QtCore import Signal, QObject, Qt, QRegExp
+from PySide.QtGui import QGroupBox, QVBoxLayout, QHBoxLayout, QLabel, \
                         QLineEdit, QComboBox, QStringListModel, QCheckBox, \
                         QGridLayout, QDoubleValidator, QRadioButton
 from numpy.testing import assert_approx_equal
@@ -28,7 +28,7 @@ class ExchangeView(QGroupBox):
 
     def __init__(self, title = 'Peak Exchange Matrix', parent = None):
         '''Initialize'''
-        super(QGroupBox, self).__init__(parent)
+        super(ExchangeView, self).__init__(parent)
         self.setTitle(title)
         self._createWidgets()
 
@@ -137,7 +137,10 @@ class ExchangeView(QGroupBox):
 
     def newExchange(self):
         '''Prepares an exchange value to be broadcasted'''
-        value = round(self.exvalue.text().toFloat()[0], 3)
+        try:
+            value = round(float(self.exvalue.text()), 3)
+        except ValueError:
+            value = 0.0
         indx = self.exchooser.currentIndex()
         if self.numpeaks[0].isChecked():
             npeaks = 2
@@ -205,7 +208,7 @@ class NumPeaks(QObject):
 
     def __init__(self, parent = None):
         '''Initiallize the function class'''
-        super(QObject, self).__init__(parent)
+        super(NumPeaks, self).__init__(parent)
         self.numPeaks = 2
 
     def getNumPeaks(self):
@@ -226,7 +229,7 @@ class NumPeaks(QObject):
     #########
 
     # The number of peaks
-    numberOfPeaksChanged = pyqtSignal(int)
+    numberOfPeaksChanged = Signal(int)
 
 #/\/\/\/\/\/\/\/
 # Exchange Model
@@ -238,7 +241,7 @@ class ExchangeModel(QObject):
 
     def __init__(self, parent = None):
         '''Initiallize the function class'''
-        super(QObject, self).__init__(parent)
+        super(ExchangeModel, self).__init__(parent)
         self.matrix = zeros((2,2))
         self.sym = True
 
@@ -255,7 +258,7 @@ class ExchangeModel(QObject):
                            '3 -> 1', '3 -> 2', '3', '3 -> 4',
                            '4 -> 1', '4 -> 2', '4 -> 3', '4'])]
         # A function to convert a string to a QStringListModel
-        f = lambda x: QStringListModel(QString(x).split('_'))
+        f = lambda x: QStringListModel(x.split('_'))
         # The two empty elements are so the model can correspond to the number
         # of peaks
         self.symex   = ['', ''] + [f(x) for x in sym]
@@ -431,4 +434,4 @@ class ExchangeModel(QObject):
     #########
 
     # Alert when the matrix is new
-    matrixChanged = pyqtSignal()
+    matrixChanged = Signal()
