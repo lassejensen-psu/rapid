@@ -36,7 +36,7 @@ class Scale(QObject):
 
     def setScale(self, min, max, reversed):
         '''Sets the rate and emits the result'''
-        replot = (self.xmin != min or self.xmax != max)
+        replot = (self.xmin != min or self.xmax != max or self.reverse != reversed)
         self.xmin = min
         self.xmax = max
         self.reverse = reversed
@@ -129,8 +129,14 @@ class ScaleView(QGroupBox):
 
     def resetScale(self):
         '''Checks that the given scale is valid, then resets if so'''
-        xmin = int(self.xmin.text())
-        xmax = int(self.xmax.text())
+        try:
+            xmin = int(self.xmin.text())
+        except ValueError:
+            return
+        try:
+            xmax = int(self.xmax.text())
+        except ValueError:
+            return
         reverse = self.reverse.isChecked()
         if xmin > xmax:
             err = "Lower limit cannot be greater than upper limit"
@@ -140,5 +146,8 @@ class ScaleView(QGroupBox):
 
     def setSelection(self, x, y):
         '''Displays the current selection'''
+        x = max(min(x, float(self.xmax.text())),
+                float(self.xmin.text()))
+        y = max(min(y, 1.0), 0.0)
         self.wavenum.setText('{0:.1f}'.format(x))
         self.intense.setText('{0:.3f}'.format(y))

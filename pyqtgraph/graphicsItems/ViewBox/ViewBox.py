@@ -1091,6 +1091,7 @@ class ViewBox(GraphicsWidget):
             return
         
         self.state['xInverted'] = b
+        self._matrixNeedsUpdate = True # updateViewRange won't detect this for us
         #self.updateMatrix(changed=(False, True))
         self.updateViewRange()
         self.sigStateChanged.emit(self)

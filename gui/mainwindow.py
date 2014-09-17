@@ -9,13 +9,14 @@ from textwrap import dedent
 from PySide.QtGui import QMainWindow, QWidget, QVBoxLayout, QPrinter, \
                         QHBoxLayout, QLabel, QPushButton, QTabWidget, \
                         QAction, QKeySequence, QFileDialog, QPushButton, \
-                        QApplication
+                        QApplication, QPainter
 from numpy import loadtxt, array
 from input_reader import ReaderError
 
 # Local imports
+import pyqtgraph
 from common import save_script, read_input, ZMat, write_data
-# from .plot import Plot
+from .plot import Plot
 from .rate import RateView
 from .exchange import ExchangeView
 from .scale import ScaleView
@@ -57,7 +58,7 @@ class MainWindow(QMainWindow):
         '''Creates all the widgets'''
 
         # Make the views
-        # self.plot = Plot(self)
+        self.plot = Plot(self)
         self.rate = RateView(parent=self)
         self.exchange = ExchangeView(parent=self)
         self.peak = PeakView(parent=self)
@@ -83,7 +84,7 @@ class MainWindow(QMainWindow):
         self.exchange.makeConnections()
         self.peak.makeConnections()
         self.scale.makeConnections()
-        # self.plot.makeConnections()
+        self.plot.makeConnections()
 
         # The window will own a button to clear raw data
         self.clear = QPushButton('Clear Raw Data', self)
@@ -109,7 +110,7 @@ class MainWindow(QMainWindow):
 
         # Add the plot 
         plot_lim = QVBoxLayout()
-        # plot_lim.addWidget(self.plot)
+        plot_lim.addWidget(self.plot)
         lim_clear = QHBoxLayout()
         lim_clear.addWidget(self.scale)
         lim_clear.addWidget(self.clear)
@@ -123,17 +124,16 @@ class MainWindow(QMainWindow):
         '''Connect the widgets to each other'''
 
         # When the controller says plot, plot
-        # self.control.plotSpectrum.connect(self.plot.plotCalculatedData)
+        self.control.plotSpectrum.connect(self.plot.plotCalculatedData)
 
         # When the controller says resize x limits, do so
-        # self.control.newXLimits.connect(self.plot.changeScale)
+        self.control.newXLimits.connect(self.plot.changeScale)
 
         # Clear raw data if pushed
         self.clear.clicked.connect(self.clearRawData)
 
         # If the plot is clicked, send info to the scale widget
-        # self.plot.pointPicked.connect(self.scale.setSelection)
-
+        self.plot.pointPicked.connect(self.scale.setSelection)
 
     def _makeMenu(self):
         '''Makes the menu bar for this widget'''
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
 
     def clearRawData(self):
         '''Clear the raw data from the plot'''
-        # self.plot.clearRawData()
+        self.plot.clearRawData()
         self.clear.setEnabled(False)
 
     def openFromInput(self):
@@ -222,14 +222,14 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getOpenFileName(self, 'Input File Name',
                                               '', filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        fileName = s
+        fileName = s[0]
 
         # Read given input file
         try:
             args = read_input(fileName)
-        except ReaderError as r: # Error reading the input file
+        except ReaderError as r:  # Error reading the input file
             error.showMessage(str(r))
 
         # Set the number of peaks
@@ -268,8 +268,8 @@ class MainWindow(QMainWindow):
         # Plot raw data if it exists
         if args.raw is not None:
             self.rawName = args.rawName
-            # self.plot.setRawData(args.raw)
-            # self.plot.plotRawData()
+            self.plot.setRawData(args.raw)
+            self.plot.plotRawData()
             self.clear.setEnabled(True)
 
         # Set the limits
@@ -295,9 +295,9 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getSaveFileName(self, 'Input File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.fileName = s
+        self.fileName = s[0]
 
         # Generate the input file
         self.inputGen(self.fileName)
@@ -312,9 +312,9 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getSaveFileName(self, 'PDF File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.pdfName = s
+        self.pdfName = s[0]
 
         # Set up the PDF printer
         printer = QPrinter()
@@ -324,7 +324,31 @@ class MainWindow(QMainWindow):
         printer.setCreator('RAPID')
 
         # Send to the plot for printing
-        # self.plot.print_(printer)
+        p = QPainter()
+        p.begin(printer)
+        x, y = self.plot.calculatedData()
+        plt = pyqtgraph.plot(x, y, antialias=True,
+                                   connect='all',
+                                   pen={'color': 'b', 'width': 0})
+        plt.setLabel('bottom', "Frequency (Wavenumbers, cm<sup>-1</sup>)")
+        plt.getAxis('bottom').setPen('k')
+        plt.setLabel('left', "Intensity (Normalized)")
+        plt.getAxis('left').setPen('k')
+        plt.setYRange(0, 1.1, padding=0)
+        plt.invertX(self.plot.reversed)
+        plt.setBackground('w')  # White
+
+        # The raw (experimental) data, if any
+        if self.plot.rawData is not None:
+            data = self.plot.getRawData()
+            x, y = data[:,0], data[:,1]
+            curve2 = pyqtgraph.PlotCurveItem(x, y,
+                                             antialias=True,
+                                             connect='all',
+                                             pen={'color': 'g', 'width': 0})
+            plt.addItem(curve2)
+        plt.render(p)
+        p.end()
 
     def exportXYData(self):
         '''Export current spectrum to XY data'''
@@ -336,9 +360,9 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getSaveFileName(self, 'Calculated XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.expName = s
+        self.expName = s[0]
 
         # Grab the XY data from the plot
         x, y = self.plot.calculatedData()
@@ -350,20 +374,20 @@ class MainWindow(QMainWindow):
 
     def exportRawData(self):
         '''Export current raw data to XY data'''
-        # if self.plot.rawData is None:
-        #     error.showMessage('Cannot export.. there is no raw data to export yet')
-            # return
+        if self.plot.rawData is None:
+            error.showMessage('Cannot export.. there is no raw data to export yet')
+            return
         filter = 'Data Files (*.txt *.data);;All (*)'
         d = '' if self.rawExpName is None else self.rawExpName
         s = QFileDialog.getSaveFileName(self, 'Raw XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.rawExpName = s
+        self.rawExpName = s[0]
 
         # Grab the raw XY data from the plot
-        # data = self.plot.getRawData()
+        data = self.plot.getRawData()
         # Save in a standard format
         try:
             write_data(data[:,0], data[:,1], self.rawExpName)
@@ -377,14 +401,14 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getOpenFileName(self, 'Raw XY Data File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.rawName = s
+        self.rawName = s[0]
 
         # Load raw data and plot in a second curve
         rawData = loadtxt(str(self.rawName))
-        # self.plot.setRawData(rawData)
-        # self.plot.plotRawData()
+        self.plot.setRawData(rawData)
+        self.plot.plotRawData()
         self.clear.setEnabled(True)
 
     def makeScript(self):
@@ -397,17 +421,17 @@ class MainWindow(QMainWindow):
         s = QFileDialog.getSaveFileName(self, 'Python Script File Name',
                                               d, filter)
         # Continue unless the user hit cancel
-        if not s:
+        if not s[0]:
             return
-        self.scriptName = s
+        self.scriptName = s[0]
 
         # Get parameters needed
         xlim, rev, oldp, newp = self.control.getParametersForScript()
-        # x, y = self.plot.calculatedData()
-        # if self.clear.isEnabled():
-        #     raw = self.plot.rawData()
-        # else:
-        #     raw = None
+        x, y = self.plot.calculatedData()
+        if self.clear.isEnabled():
+            raw = self.plot.rawData
+        else:
+            raw = None
         save_script(x, y, raw, xlim, rev, oldp, newp, self.scriptName)
 
     def inputGen(self, fileName):

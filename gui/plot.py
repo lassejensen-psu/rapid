@@ -1,22 +1,25 @@
 from __future__ import print_function, division, absolute_import
 
 # Non-std. lib imports
-from PySide.Qwt5 import QwtPlot, QwtPlotCurve, QwtPlotPicker
-from PySide.Qt import QFrame, QPalette, QColor, QPen
+from PySide.QtGui import QFrame, QPalette, QColor, QPen, QApplication
 from PySide.QtCore import Qt, Signal
+from pyqtgraph import PlotWidget, ViewBox
 from numpy import array
+from random import random
 
 # Local imports
 from common import normalize, clip
 from .guicommon import error
 
 
-class Plot(QwtPlot):
+class Plot(PlotWidget):
     '''A plot'''
 
     def __init__(self, parent, title = ''):
         '''Initialize the plot and it's parent class'''
-        super(QwtPlot, self).__init__(parent)
+        border = {'color': 0.5, 'width': 2}
+        super(Plot, self).__init__(parent,
+                                   viewBox=ViewBox(border=border))
         self._setupPlot(title)
 
     def _setupPlot(self, title):
@@ -27,59 +30,46 @@ class Plot(QwtPlot):
             self.setTitle(title)
         self.rawData = None
 
+        # Default to not-reversed
+        self.reversed = False
+
         # Set the axes for the intial data
-        self.setAxisTitle(self.xBottom, "Frequency (Wavenumbers, cm<sup>-1</sup>)")
-        self.setAxisTitle(self.yLeft, "Intensity (Normalized)")
-        self.setAxisScale(self.yLeft, -0.1, 1.1)
+        self.getPlotItem().setLabel('bottom', "Frequency (Wavenumbers, cm<sup>-1</sup>)")
+        self.getPlotItem().getAxis('bottom').setPen('k')
+        self.getPlotItem().setLabel('left', "Intensity (Normalized)")
+        self.getPlotItem().getAxis('left').setPen('k')
+        self.getPlotItem().setYRange(0, 1.1, padding=0)
 
-        # Make the background white and the line thick enough to see
-        self.canvas().setLineWidth(2)
-        self.canvas().setFrameStyle(QFrame.Box | QFrame.Plain)
-        canvasPalette = QPalette(Qt.white)
-        canvasPalette.setColor(QPalette.Foreground, Qt.gray)
-        self.canvas().setPalette(canvasPalette)
+        # # Make the background white and the line thick enough to see
+        self.setBackground('w')  # White
 
-        # Create the XY data points
-        self.data = QwtPlotCurve()
-        self.data.setRenderHint(QwtPlotCurve.RenderAntialiased)
-        self.data.setPen(QPen(Qt.blue, 2))
-        self.data.attach(self)
+        # Create the XY data points.  Empty for now.
+        self.data = self.getPlotItem().plot([], [],
+                                            antialias=True,
+                                            connect='all',
+                                            pen={'color': 'b', 'width': 2})
 
         # The raw (experimental) data, if any
-        self.raw = QwtPlotCurve()
-        self.raw.setRenderHint(QwtPlotCurve.RenderAntialiased)
-        self.raw.setPen(QPen(Qt.darkGreen, 2))
-        self.raw.attach(self)
+        self.raw = self.getPlotItem().plot([], [],
+                                           antialias=True,
+                                           connect='all',
+                                           pen={'color': 'g', 'width': 2})
 
-        # Make sure the plot is wide enough
-        self.setMinimumWidth(800)
-
-        # Get a plot picker to get the current coordinates
-        self.picker = QwtPlotPicker(
-                        QwtPlot.xBottom,
-                        QwtPlot.yLeft,
-                        QwtPlotPicker.PointSelection | QwtPlotPicker.DragSelection,
-                        QwtPlotPicker.CrossRubberBand,
-                        QwtPlotPicker.ActiveOnly,
-                        self.canvas())
-        self.picker.setRubberBandPen(QPen(Qt.black))
-        self.picker.setTrackerPen(QPen(Qt.red))
+        # # Make sure the plot is wide enough
+        self.setMinimumWidth(850)
 
     def makeConnections(self):
         '''Connect the plot together'''
-        self.picker.selected.connect(self.catchSelection)
-        self.picker.moved.connect(self.catchSelection)
+        self.scene().sigMouseMoved.connect(self.catchSelection)
 
     def calculatedData(self):
         '''Return the calculated data'''
-        x = array(self.data.data().xData())
-        y = array(self.data.data().yData())
-        return x, y
+        x, y = self.data.getData()
+        return array(x), array(y)
 
     def getRawData(self):
         '''Return the raw data in same format it was read in'''
-        x = array(self.raw.data().xData())
-        y = array(self.raw.data().yData())
+        x, y = self.raw.getData()
         return array([x, y]).T
 
     def setRawData(self, raw):
@@ -91,8 +81,7 @@ class Plot(QwtPlot):
         if self.rawData is None:
             error.showMessage("Cannot plot raw data, none has been given")
             return
-        s = self.axisScaleDiv(self.xBottom)
-        xlim = [s.lowerBound(), s.upperBound()]
+        xlim = self.data.dataBounds(0)
         if xlim[0] > xlim[1]:
             xlim[0], xlim[1] = xlim[1], xlim[0]
         # Clip the data to only the plotting window (to remove baseline)
@@ -109,29 +98,32 @@ class Plot(QwtPlot):
 
     def plotCalculatedData(self, x, y):
         '''Plot the calculated data'''
-        y = normalize(y)
+        try:
+            y = normalize(y)
+        except ValueError:  # Occurs on startup
+            return
         self.data.setData(x, y)
         self.replot()
 
     def clearRawData(self):
         '''Clear the raw data'''
-        self.raw.hide()
         self.rawData = None
-        self.replot()
+        self.raw.clear()
 
     def changeScale(self, min, max, reversed):
         '''Change the axis scale'''
-        if reversed:
-            self.setAxisScale(self.xBottom, max, min)
-        else:
-            self.setAxisScale(self.xBottom, min, max)
-        self.replot()
+        self.reversed = reversed
+        self.getPlotItem().invertX(reversed)
+        self.getPlotItem().setXRange(min, max)
+        x, y = self.calculatedData()
+        self.plotCalculatedData(x, y)
         if self.rawData is not None:
             self.plotRawData()
 
     def catchSelection(self, point):
         '''Catch a point and re-emit'''
-        self.pointPicked.emit(point.x(), point.y())
+        p = self.getPlotItem().getViewBox().mapSceneToView(point)
+        self.pointPicked.emit(p.x(), p.y())
 
     #########
     # SIGNALS

@@ -26,7 +26,7 @@ def plot(args, x, y):
         xlim(args.xlim[1], args.xlim[0])
     else:
         xlim(args.xlim[0], args.xlim[1])
-    ylim(-0.1, 1.2)
+    ylim(-0.05, 1.1)
     xlabel('Wavenumbers')
     ylabel('Intensity (Normalized)')
     show()

@@ -55,7 +55,7 @@ def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile, ms
 
                      # You can manually edit the x- and y-axis limits
                      xlim({xmin}, {xmax})
-                     ylim(-0.1, 1.2)
+                     ylim(-0.05, 1.1)
 
                      # You can manually edit the x- and y-axis labels
                      xlabel('Wavenumbers')
