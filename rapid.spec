@@ -4,7 +4,7 @@ import sys
 # This spec file is designed to be run in this directory
 # The pathex list is empty because we cannot know where 
 # each user will place pyinstaller.
-a = Analysis(['rapid.py'],
+a = Analysis(['rapid/__main__.py'],
              pathex=[],
              hiddenimports=['scipy.special._ufuncs_cxx'],
              hookspath=None)

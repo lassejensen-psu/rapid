@@ -7,8 +7,8 @@ from PySide.QtGui import QGroupBox, QHBoxLayout, QLabel, \
 from numpy import arange
 
 # Local imports
-from .guicommon import error
-from .guicommon import toolTipText as ttt
+from rapid.gui.guicommon import error
+from rapid.gui.guicommon import toolTipText as ttt
 
 
 class Scale(QObject):

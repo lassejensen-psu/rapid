@@ -7,7 +7,7 @@ from textwrap import dedent
 from numpy import set_string_function
 
 # Local imports
-from .utils import numerics
+from rapid.common.utils import numerics
 
 
 def save_script(x, y, raw, xlim, reverse, old_params, new_params, scriptfile, msg=False):

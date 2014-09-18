@@ -13,9 +13,9 @@ from numpy.testing import assert_approx_equal
 from numpy import zeros, vstack, ndenumerate, ndindex, ndarray
 
 # Local imports
-from common import ZMat
-from .guicommon import error
-from .guicommon import toolTipText as ttt
+from rapid.common import ZMat
+from rapid.gui.guicommon import error
+from rapid.gui.guicommon import toolTipText as ttt
 
 
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )

@@ -16,13 +16,13 @@ from .python2_3 import asUnicode
 ## Automatically determine whether to use PyQt or PySide. 
 ## This is done by first checking to see whether one of the libraries
 ## is already imported. If not, then attempt to import PyQt4, then PySide.
-if 'PyQt4' in sys.modules:
+if False:  # 'PyQt4' in sys.modules:
     USE_PYSIDE = False
 elif 'PySide' in sys.modules:
     USE_PYSIDE = True
 else:
     try:
-        import PyQt4
+        import this_is_not_a_valid_module_so_an_ImportError_is_raised  # PyQt4
         USE_PYSIDE = False
     except ImportError:
         try:
@@ -101,33 +101,34 @@ if USE_PYSIDE:
     
     
 else:
-    from PyQt4 import QtGui, QtCore, uic
-    try:
-        from PyQt4 import QtSvg
-    except ImportError:
-        pass
-    try:
-        from PyQt4 import QtOpenGL
-    except ImportError:
-        pass
-    try:
-        from PyQt4 import QtTest
-    except ImportError:
-        pass
+    pass
+    # from PyQt4 import QtGui, QtCore, uic
+    # try:
+    #     from PyQt4 import QtSvg
+    # except ImportError:
+    #     pass
+    # try:
+    #     from PyQt4 import QtOpenGL
+    # except ImportError:
+    #     pass
+    # try:
+    #     from PyQt4 import QtTest
+    # except ImportError:
+    #     pass
 
 
-    import sip
-    def isQObjectAlive(obj):
-        return not sip.isdeleted(obj)
-    loadUiType = uic.loadUiType
+    # import sip
+    # def isQObjectAlive(obj):
+    #     return not sip.isdeleted(obj)
+    # loadUiType = uic.loadUiType
 
-    QtCore.Signal = QtCore.pyqtSignal
-    VERSION_INFO = 'PyQt4 ' + QtCore.PYQT_VERSION_STR + ' Qt ' + QtCore.QT_VERSION_STR
+    # QtCore.Signal = QtCore.pyqtSignal
+    # VERSION_INFO = 'PyQt4 ' + QtCore.PYQT_VERSION_STR + ' Qt ' + QtCore.QT_VERSION_STR
 
 
 ## Make sure we have Qt >= 4.7
 versionReq = [4, 7]
-QtVersion = PySide.QtCore.__version__ if USE_PYSIDE else QtCore.QT_VERSION_STR
+QtVersion = PySide.QtCore.__version__  # if USE_PYSIDE else QtCore.QT_VERSION_STR
 m = re.match(r'(\d+)\.(\d+).*', QtVersion)
 if m is not None and list(map(int, m.groups())) < versionReq:
     print(list(map(int, m.groups())))

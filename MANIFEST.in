@@ -1,0 +1,9 @@
+include README.rst
+include LICENSE
+graft rapid
+global-exclude *.pyc
+include rapid.spec
+include distclean
+include setup.py
+include setup.cfg
+include template.inp

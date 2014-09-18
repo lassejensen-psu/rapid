@@ -11,8 +11,8 @@ from PySide.QtGui import QGroupBox, QHBoxLayout, QVBoxLayout, QLabel, \
 from numpy.testing import assert_approx_equal
 
 # Local imports
-from .guicommon import error
-from .guicommon import toolTipText as ttt
+from rapid.gui.guicommon import error
+from rapid.gui.guicommon import toolTipText as ttt
 
 HZ2WAVENUM = 1 / ( 100 * 2.99792458E8 * 2 * pi )
 

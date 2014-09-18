@@ -3,13 +3,13 @@ from __future__ import print_function, division, absolute_import
 # Non-std. lib imports
 from PySide.QtGui import QFrame, QPalette, QColor, QPen, QApplication
 from PySide.QtCore import Qt, Signal
-from pyqtgraph import PlotWidget, ViewBox
 from numpy import array
 from random import random
 
 # Local imports
-from common import normalize, clip
-from .guicommon import error
+from rapid.pyqtgraph import PlotWidget, ViewBox
+from rapid.common import normalize, clip
+from rapid.gui.guicommon import error
 
 
 class Plot(PlotWidget):

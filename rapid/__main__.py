@@ -14,50 +14,22 @@ from sys import argv, exit, stderr, executable
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from subprocess import call
 
-__version__ = '0.9'
+# Local imports
+from rapid._version import __version__
 
 
-if __name__ == '__main__':
-
-    # Try to import numpy and scipy, because these are needed
-    # no matter the execution method
-    try:
-        import numpy
-    except ImportError:
-        print('It appears that you are missing numpy.', file=stderr)
-        print('spectral_exchange requires numpy, so you should', file=stderr)
-        print('install it using your favorite method', file=stderr)
-        exit(1)
-    try:
-        import scipy
-    except ImportError:
-        print('It appears that you are missing scipy.', file=stderr)
-        print('spectral_exchange requires scipy, so you should', file=stderr)
-        print('install it using your favorite method', file=stderr)
-        exit(1)
-    # Also try input_reader, since both branches need that
-    try:
-        from input_reader import ReaderError
-    except ImportError:
-        print("Cannot find input_reader module, so you should", file=stderr)
-        print("install it using your favorite method", file=stderr)
-        exit(1)
+def main():
+    """Main Driver."""
 
     # Set up an argument parser so that command line help can be given
     parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
                             description=__doc__,
                             prog='RAPID')
-    parser.add_argument('--version', action='version', version='%(prog)s {}'.format(__version__))
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {}'.format(__version__))
     parser.add_argument('input_file', nargs='?',
         help='This is the file containing the information needed to execute the '
-             'calculation.  If not included, GUI mode will be entered. '
-             'NOTE: If the file ends with ".py", it is assumed it is a Python '
-             'script and will be executed as one. This is intended for users '
-             'without Python installed on their machine who wish to be able to '
-             'view the scripts made with the "-s" option.  It can also be used '
-             'as a general Python interpreter, with the StdLib, numpy, scipy, '
-             'matplotlib, pylab, and input_reader modules installed.  It is not '
-             'possible to add more modules.')
+             'calculation.  If not included, GUI mode will be entered.')
     meg = parser.add_mutually_exclusive_group()
     meg.add_argument('--params', '-p', action='store_true', default=False,
         help='Print to the screen how the exchange has modified the peak parameters '
@@ -77,14 +49,14 @@ if __name__ == '__main__':
 
     # If no argument was given, then run in GUI mode
     if not args.input_file:
-        from gui import run_gui
+        from rapid.gui import run_gui
         exit(run_gui())
 
-    # Otherwise, run non-interactively, unless the file extension is
-    # .py, in which case run as a python file using the current executable
+    # Otherwise, run non-interactively
     else:
-        if args.input_file.endswith('.py'):
-            exit(call([executable, args.input_file]))
-        else:
-            from cl import run_non_interactive
-            exit(run_non_interactive(args))
+        from rapid.cl import run_non_interactive
+        exit(run_non_interactive(args))
+
+
+if __name__ == '__main__':
+    main()

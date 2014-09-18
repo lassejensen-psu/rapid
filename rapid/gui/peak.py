@@ -7,7 +7,7 @@ from PySide.QtGui import QTabWidget, QVBoxLayout, QWidget, QLineEdit, \
 from numpy import asarray, nan
 
 # Local imports
-from .guicommon import toolTipText as ttt
+from rapid.gui.guicommon import toolTipText as ttt
 
 
 class PeakView(QTabWidget):

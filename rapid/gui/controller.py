@@ -5,11 +5,11 @@ from PySide.QtCore import Signal, QObject
 from numpy import ndarray, isnan, sum
 
 # Local imports
-from common import spectrum
-from .peak import PeakModel
-from .exchange import ExchangeModel, NumPeaks
-from .rate import Rate
-from .scale import Scale
+from rapid.common import spectrum
+from rapid.gui.peak import PeakModel
+from rapid.gui.exchange import ExchangeModel, NumPeaks
+from rapid.gui.rate import Rate
+from rapid.gui.scale import Scale
 
 
 class Controller(QObject):

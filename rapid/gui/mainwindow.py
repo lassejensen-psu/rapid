@@ -14,16 +14,17 @@ from numpy import loadtxt, array
 from input_reader import ReaderError
 
 # Local imports
-import pyqtgraph
-from common import save_script, read_input, ZMat, write_data
-from .plot import Plot
-from .rate import RateView
-from .exchange import ExchangeView
-from .scale import ScaleView
-from .peak import PeakView
-from .controller import Controller
-from .guicommon import error
-from .guicommon import toolTipText as ttt
+from rapid.pyqtgraph import PlotCurveItem
+from rapid.pyqtgraph import plot as pgplot
+from rapid.common import save_script, read_input, ZMat, write_data
+from rapid.gui.plot import Plot
+from rapid.gui.rate import RateView
+from rapid.gui.exchange import ExchangeView
+from rapid.gui.scale import ScaleView
+from rapid.gui.peak import PeakView
+from rapid.gui.controller import Controller
+from rapid.gui.guicommon import error
+from rapid.gui.guicommon import toolTipText as ttt
 
 
 class MainWindow(QMainWindow):
@@ -327,9 +328,10 @@ class MainWindow(QMainWindow):
         p = QPainter()
         p.begin(printer)
         x, y = self.plot.calculatedData()
-        plt = pyqtgraph.plot(x, y, antialias=True,
-                                   connect='all',
-                                   pen={'color': 'b', 'width': 0})
+        plt = pgplot(x, y,
+                     antialias=True,
+                     connect='all',
+                     pen={'color': 'b', 'width': 0})
         plt.setLabel('bottom', "Frequency (Wavenumbers, cm<sup>-1</sup>)")
         plt.getAxis('bottom').setPen('k')
         plt.setLabel('left', "Intensity (Normalized)")
@@ -342,10 +344,10 @@ class MainWindow(QMainWindow):
         if self.plot.rawData is not None:
             data = self.plot.getRawData()
             x, y = data[:,0], data[:,1]
-            curve2 = pyqtgraph.PlotCurveItem(x, y,
-                                             antialias=True,
-                                             connect='all',
-                                             pen={'color': 'g', 'width': 0})
+            curve2 = PlotCurveItem(x, y,
+                                   antialias=True,
+                                   connect='all',
+                                   pen={'color': 'g', 'width': 0})
             plt.addItem(curve2)
         plt.render(p)
         p.end()

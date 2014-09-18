@@ -8,9 +8,9 @@ from numpy import arange
 from input_reader import ReaderError
 
 # Local imports
-from common import spectrum, SpectrumError, ZMat, normalize, clip, \
-                   numerics, write_data, save_script, read_input
-from .plot import plot
+from rapid.common import spectrum, SpectrumError, ZMat, normalize, clip, \
+                     numerics, write_data, save_script, read_input
+from rapid.cl.plot import plot
 
 
 def run_non_interactive(cmd_line_args):
